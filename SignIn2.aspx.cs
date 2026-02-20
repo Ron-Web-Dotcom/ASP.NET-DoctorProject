@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -51,16 +51,15 @@ public partial class SignIn2 : System.Web.UI.Page
         string Email = TextBox1.Text;
         string Password = TextBox2.Text;
 
-        myCommand.Connection = connection;
-        string insertSQL;
-        insertSQL = "SELECT * FROM Users WHERE Email='" + Email + "' AND password='" + Password + "'";
+        string insertSQL = "SELECT * FROM Users WHERE Email=@Email AND password=@Password";
         myCommand.CommandText = insertSQL;
+        myCommand.Parameters.AddWithValue("@Email", Email);
+        myCommand.Parameters.AddWithValue("@Password", Password);
+
         SqlDataReader read = myCommand.ExecuteReader();
-        read.Read();
 
-        if (read.HasRows == true)
+        if (read.Read())
         {
-
             Session["FirstName"] = read["FirstName"].ToString();
             Session["LastName"] = read["LastName"].ToString();
 
@@ -68,10 +67,8 @@ public partial class SignIn2 : System.Web.UI.Page
         }
         else
         {
-           // Label1.Text = "no such user";
+            Label1.Text = "Invalid email or password.";
         }
-
-
     }
 
 }

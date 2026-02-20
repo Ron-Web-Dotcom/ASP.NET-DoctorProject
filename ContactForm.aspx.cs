@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -26,22 +26,16 @@ public partial class Form : System.Web.UI.Page
         string Email = TextBox3.Text;
         string PhoneNum = TextBox4.Text;
         string Message = TextBox5.Text;
-        myCommand.Connection = connection;
-        string insertSQL;
-        insertSQL = "INSERT INTO [Contacts] (FirstName, Lastname,Email,PhoneNum,Message) VALUES ('" + FirstName + "','" + LastName + "','" + Email + "', '" + PhoneNum + "','" + Message + "')";
+
+        string insertSQL = "INSERT INTO [Contacts] (FirstName, Lastname, Email, PhoneNum, Message) VALUES (@FirstName, @LastName, @Email, @PhoneNum, @Message)";
         myCommand.CommandText = insertSQL;
+        myCommand.Parameters.AddWithValue("@FirstName", FirstName);
+        myCommand.Parameters.AddWithValue("@LastName", LastName);
+        myCommand.Parameters.AddWithValue("@Email", Email);
+        myCommand.Parameters.AddWithValue("@PhoneNum", PhoneNum);
+        myCommand.Parameters.AddWithValue("@Message", Message);
+
         myCommand.ExecuteNonQuery();
         Response.Redirect("HomePage.aspx");
-
     }
 }
-
-//    catch (SqlException)
-//    {
-//      Label1.Text = "error";
-
-//    }
-//    }
-//}
-
-

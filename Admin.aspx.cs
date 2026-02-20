@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -44,28 +44,25 @@ public partial class admin : System.Web.UI.Page
         string Email = TextBox1.Text;
         string Password = TextBox2.Text;
 
-        myCommand.Connection = connection;
-        string insertSQL;
-        insertSQL = "SELECT * FROM Admins WHERE Email='" + Email + "' AND password='" + Password + "'";
+        string insertSQL = "SELECT * FROM Admins WHERE Email=@Email AND password=@Password";
         myCommand.CommandText = insertSQL;
+        myCommand.Parameters.AddWithValue("@Email", Email);
+        myCommand.Parameters.AddWithValue("@Password", Password);
+
         SqlDataReader read = myCommand.ExecuteReader();
-        read.Read();
 
-        //if (read.HasRows == true)
-        //{
-
-        //    Session["FirstName"] = read["FirstName"].ToString();
-        //    Session["LastName"] = read["LastName"].ToString();
+        if (read.Read())
+        {
+            Session["FirstName"] = read["FirstName"].ToString();
+            Session["LastName"] = read["LastName"].ToString();
 
             Response.Redirect("AdminView.aspx");
-        //}
-        //else
-        //{
-            // Label1.Text = "no such user";
         }
-
-
-    
+        else
+        {
+            Label1.Text = "Invalid email or password.";
+        }
+    }
 
 
 
@@ -78,5 +75,3 @@ public partial class admin : System.Web.UI.Page
         Response.Cookies.Add(userdata);
     }
 }
-
-   

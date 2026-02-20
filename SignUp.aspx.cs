@@ -1,4 +1,4 @@
-﻿  using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
+
 public partial class SignUp : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
@@ -29,23 +30,23 @@ public partial class SignUp : System.Web.UI.Page
             string Month = DropDownList1.SelectedValue;
             string Day = DropDownList2.SelectedValue;
             string Year = DropDownList3.SelectedValue;
-            string insertSQL;
-            insertSQL = "INSERT INTO [Users] (FirstName, LastName, Email, Password, Month, Day, Year ) VALUES ('" + FirstName + "','" + LastName + "','" + Email + "', '" + Password + "','" + Month + "','" + Day + "','" + Year + "')";
+
+            string insertSQL = "INSERT INTO [Users] (FirstName, LastName, Email, Password, Month, Day, Year) VALUES (@FirstName, @LastName, @Email, @Password, @Month, @Day, @Year)";
             myCommand.CommandText = insertSQL;
+            myCommand.Parameters.AddWithValue("@FirstName", FirstName);
+            myCommand.Parameters.AddWithValue("@LastName", LastName);
+            myCommand.Parameters.AddWithValue("@Email", Email);
+            myCommand.Parameters.AddWithValue("@Password", Password);
+            myCommand.Parameters.AddWithValue("@Month", Month);
+            myCommand.Parameters.AddWithValue("@Day", Day);
+            myCommand.Parameters.AddWithValue("@Year", Year);
+
             myCommand.ExecuteNonQuery();
             Response.Redirect("AppointmentForm.aspx");
-
         }
         catch (SqlException)
         {
-            //Label1.Text = "error";
-
+            Label1.Text = "An error occurred. Please try again.";
         }
     }
 }
-
-                
-           
-      
-        
-    
