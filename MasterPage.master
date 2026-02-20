@@ -104,6 +104,7 @@
                          </li>
                            <a href="admin.aspx" title="..." target="_blank"><img src="images/User-Administrator-Blue-icon.png"width="2" height="2"></a>
                            <a href="AdminSignUpaspx.aspx" title="..." target="_blank"><img src="images/User-Administrator-Blue-icon.png"width="2" height="2"></a>
+                        <li><a href="AIChatAssistant.aspx"><span class="glyphicon glyphicon-comment"></span> AI Assistant</a></li>
                         <asp:LinkButton ID="LinkButton1" runat="server"><a href="SignIn2.aspx">Sign In</a></asp:LinkButton>
 
                         <asp:LinkButton ID="LinkButton2" runat="server"><a href="SignUp.aspx">Sign Up</a></asp:LinkButton>

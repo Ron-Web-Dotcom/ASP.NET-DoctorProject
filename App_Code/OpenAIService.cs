@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Net;
@@ -100,6 +101,100 @@ public static class OpenAIService
             // Log to Application event or trace; don't crash the form submission
             System.Diagnostics.Trace.TraceError("OpenAIService.GetTriage error: " + ex.Message);
             return new TriageResult { Triage = "Error", Note = "AI triage could not be completed at this time." };
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // General site assistant (chat)
+    // -----------------------------------------------------------------------
+
+    private const string ChatSystemPrompt =
+        "You are the helpful AI assistant for Portmore Medical Center. " +
+        "Your role is to help patients and visitors learn about the clinic, its services, staff, and how to book appointments.\n\n" +
+        "Services offered:\n" +
+        "- Cardiology (heart-related conditions)\n" +
+        "- General Practitioner (routine check-ups, general health concerns)\n" +
+        "- Gynaecology (women's health)\n" +
+        "- Opticology (eye care and vision)\n" +
+        "- Paediatrics (child health)\n" +
+        "- Radiology (medical imaging and scans)\n" +
+        "- Surgery (surgical procedures)\n\n" +
+        "Patients can book an appointment via the Appointment Form on the website. " +
+        "They can Sign Up for an account or Sign In to access personalised features. " +
+        "The Contact Form is available for general enquiries.\n\n" +
+        "Be friendly, professional, and concise. " +
+        "For medical emergencies always advise the patient to call emergency services or go to the nearest emergency room immediately. " +
+        "Do not provide specific diagnoses, prescribe treatments, or replace professional medical advice.";
+
+    /// <summary>
+    /// Sends a conversation to GPT-4 and returns the assistant's reply.
+    /// conversationJson is a JSON array of {role, content} objects representing prior turns (may be null).
+    /// </summary>
+    public static string GetChatResponse(string userMessage, string conversationJson = null)
+    {
+        string apiKey = ConfigurationManager.AppSettings["OpenAIApiKey"];
+
+        if (string.IsNullOrEmpty(apiKey) || apiKey == "YOUR_OPENAI_API_KEY_HERE")
+            return "The AI assistant is not configured yet. Please contact clinic staff for assistance.";
+
+        try
+        {
+            var messages = new List<Dictionary<string, string>>();
+            messages.Add(new Dictionary<string, string> { { "role", "system" }, { "content", ChatSystemPrompt } });
+
+            if (!string.IsNullOrEmpty(conversationJson))
+            {
+                try
+                {
+                    var history = (ArrayList)Json.DeserializeObject(conversationJson);
+                    foreach (Dictionary<string, object> turn in history)
+                    {
+                        messages.Add(new Dictionary<string, string>
+                        {
+                            { "role",    turn["role"].ToString() },
+                            { "content", turn["content"].ToString() }
+                        });
+                    }
+                }
+                catch { /* ignore malformed history */ }
+            }
+
+            messages.Add(new Dictionary<string, string> { { "role", "user" }, { "content", userMessage } });
+
+            var requestPayload = new Dictionary<string, object>
+            {
+                { "model",       "gpt-4" },
+                { "temperature", 0.7 },
+                { "max_tokens",  500 },
+                { "messages",    messages }
+            };
+
+            string requestJson = Json.Serialize(requestPayload);
+
+            using (var client = new WebClient())
+            {
+                client.Headers.Add("Content-Type",  "application/json");
+                client.Headers.Add("Authorization", "Bearer " + apiKey);
+
+                string responseJson = client.UploadString(
+                    "https://api.openai.com/v1/chat/completions", requestJson);
+
+                var outer   = (Dictionary<string, object>)Json.DeserializeObject(responseJson);
+                var choices = (ArrayList)outer["choices"];
+                var choice  = (Dictionary<string, object>)choices[0];
+                var message = (Dictionary<string, object>)choice["message"];
+                return message["content"].ToString().Trim();
+            }
+        }
+        catch (WebException ex)
+        {
+            System.Diagnostics.Trace.TraceError("OpenAIService.GetChatResponse WebException: " + ex.Message);
+            return "I'm sorry, I'm having trouble connecting right now. Please try again or contact us via the Contact Form.";
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("OpenAIService.GetChatResponse error: " + ex.Message);
+            return "I'm sorry, something went wrong. Please try again later.";
         }
     }
 }
