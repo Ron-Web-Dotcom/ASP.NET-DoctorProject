@@ -104,7 +104,13 @@
                          </li>
                            <a href="admin.aspx" title="..." target="_blank"><img src="images/User-Administrator-Blue-icon.png"width="2" height="2"></a>
                            <a href="AdminSignUpaspx.aspx" title="..." target="_blank"><img src="images/User-Administrator-Blue-icon.png"width="2" height="2"></a>
-                        <li><a href="AIChatAssistant.aspx"><span class="glyphicon glyphicon-comment"></span> AI Assistant</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-flash"></span> AI Tools<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="AIChatAssistant.aspx"><span class="glyphicon glyphicon-comment"></span> AI Assistant</a></li>
+                                <li><a href="SymptomChecker.aspx"><span class="glyphicon glyphicon-search"></span> Symptom Checker</a></li>
+                            </ul>
+                        </li>
                         <asp:LinkButton ID="LinkButton1" runat="server"><a href="SignIn2.aspx">Sign In</a></asp:LinkButton>
 
                         <asp:LinkButton ID="LinkButton2" runat="server"><a href="SignUp.aspx">Sign Up</a></asp:LinkButton>

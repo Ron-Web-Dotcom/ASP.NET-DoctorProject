@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Data.SqlClient;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -9,12 +9,58 @@ public partial class AdminView : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-
     }
 
     protected void GridView4_SelectedIndexChanged(object sender, EventArgs e)
     {
+    }
 
+    protected void BtnRefreshInsights_Click(object sender, EventArgs e)
+    {
+        string summary = BuildAppointmentSummary();
+        string insight = OpenAIService.GetAdminInsights(summary);
+        LitInsights.Text = System.Web.HttpUtility.HtmlEncode(insight);
+    }
+
+    private string BuildAppointmentSummary()
+    {
+        var sb = new StringBuilder();
+        try
+        {
+            using (SqlConnection conn = connectionManager.GetMembersConnection())
+            {
+                // Total appointments
+                using (var cmd = new SqlCommand("SELECT COUNT(*) FROM [Appointments]", conn))
+                {
+                    int total = (int)cmd.ExecuteScalar();
+                    sb.AppendLine("Total appointments: " + total);
+                }
+
+                // Breakdown by service
+                sb.AppendLine("\nAppointments by service:");
+                using (var cmd = new SqlCommand("SELECT Services, COUNT(*) AS Cnt FROM [Appointments] GROUP BY Services ORDER BY Cnt DESC", conn))
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                        sb.AppendLine("  " + rdr["Services"] + ": " + rdr["Cnt"]);
+                }
+
+                // Triage breakdown
+                sb.AppendLine("\nAI Triage breakdown:");
+                using (var cmd = new SqlCommand("SELECT AITriage, COUNT(*) AS Cnt FROM [Appointments] WHERE AITriage IS NOT NULL GROUP BY AITriage ORDER BY Cnt DESC", conn))
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                        sb.AppendLine("  " + rdr["AITriage"] + ": " + rdr["Cnt"]);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            sb.AppendLine("(Could not load full data: " + ex.Message + ")");
+        }
+
+        return sb.ToString();
     }
 
     /// <summary>

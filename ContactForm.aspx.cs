@@ -36,6 +36,11 @@ public partial class Form : System.Web.UI.Page
         myCommand.Parameters.AddWithValue("@Message", Message);
 
         myCommand.ExecuteNonQuery();
-        Response.Redirect("HomePage.aspx");
+
+        // Generate AI-drafted reply and show thank-you panel
+        string aiReply = OpenAIService.GetContactReply(FirstName, Message);
+        LitAIReply.Text       = System.Web.HttpUtility.HtmlEncode(aiReply);
+        PanelForm.Visible     = false;
+        PanelThankyou.Visible = true;
     }
 }

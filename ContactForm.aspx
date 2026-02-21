@@ -20,6 +20,23 @@
             <p>Please use the form below to get in touch with us if you have any general questions or any comments or suggestions about this website. Please DO NOT use this form to request or send any kind of medical information.</p>
             </div>
          </div>
+    <!-- Shown after successful submission -->
+    <asp:Panel ID="PanelThankyou" runat="server" Visible="false" style="max-width:640px;margin:30px auto;">
+        <div class="alert alert-success">
+            <h4><span class="glyphicon glyphicon-ok-circle"></span> Thank you for contacting us!</h4>
+            <p>Your message has been received. Here is a draft reply our team will be sending you:</p>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong><span class="glyphicon glyphicon-comment"></span> AI-Drafted Reply</strong></div>
+            <div class="panel-body" style="white-space:pre-wrap;">
+                <asp:Literal ID="LitAIReply" runat="server" />
+            </div>
+        </div>
+        <a href="HomePage.aspx" class="btn btn-primary">Return to Home</a>
+    </asp:Panel>
+
+    <!-- Contact form (hidden after submit) -->
+    <asp:Panel ID="PanelForm" runat="server">
           <table class="nav-justified">
                 <tr>
                     <td style="width: 429px">FirstName :<asp:TextBox ID="TextBox1" runat="server" Width="257px"></asp:TextBox>
@@ -68,6 +85,7 @@
             <p class="pull-down">&copy; 2011 MedicalCenter.com &middot;<a href="HomePage.aspx">Home</a>&middot;<a href="#">About Us</a>&middot;<a href="#">Service</a>&middot;<a href="#">Bio</a></p>
         </div>
     </footer>
+    </asp:Panel><%-- close PanelForm --%>
      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
  
 </asp:Content>

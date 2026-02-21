@@ -105,6 +105,154 @@ public static class OpenAIService
     }
 
     // -----------------------------------------------------------------------
+    // Shared private helper
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Sends a single-turn user message to GPT-4 and returns the raw content string.
+    /// Returns null on API key not configured or on any error.
+    /// </summary>
+    private static string CallGpt(string userContent, double temp = 0.7, int maxTokens = 400)
+    {
+        string apiKey = ConfigurationManager.AppSettings["OpenAIApiKey"];
+        if (string.IsNullOrEmpty(apiKey) || apiKey == "YOUR_OPENAI_API_KEY_HERE")
+            return null;
+
+        var payload = new Dictionary<string, object>
+        {
+            { "model",       "gpt-4" },
+            { "temperature", temp },
+            { "max_tokens",  maxTokens },
+            { "messages", new[] { new Dictionary<string, string> { { "role", "user" }, { "content", userContent } } } }
+        };
+
+        try
+        {
+            using (var client = new WebClient())
+            {
+                client.Headers.Add("Content-Type",  "application/json");
+                client.Headers.Add("Authorization", "Bearer " + apiKey);
+                string resp    = client.UploadString("https://api.openai.com/v1/chat/completions", Json.Serialize(payload));
+                var outer      = (Dictionary<string, object>)Json.DeserializeObject(resp);
+                var choices    = (ArrayList)outer["choices"];
+                var msgDict    = (Dictionary<string, object>)((Dictionary<string, object>)choices[0])["message"];
+                return msgDict["content"].ToString().Trim();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError("OpenAIService.CallGpt error: " + ex.Message);
+            return null;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Symptom-to-specialist checker
+    // -----------------------------------------------------------------------
+
+    public class SpecialistResult
+    {
+        public string Specialist { get; set; }
+        public string Reason     { get; set; }
+    }
+
+    /// <summary>
+    /// Given a patient's symptom description, returns the most appropriate specialist service.
+    /// </summary>
+    public static SpecialistResult GetSpecialistRecommendation(string symptoms)
+    {
+        string prompt =
+            "A patient at Portmore Medical Center describes the following symptoms or health concerns:\n\n" +
+            "\"" + symptoms + "\"\n\n" +
+            "Which ONE of these specialist services best matches their needs?\n" +
+            "- Cardiology\n- General Practitioner\n- Gynaecology\n- Opticology\n- Paediatrics\n- Radiology\n- Surgery\n\n" +
+            "Respond ONLY with valid JSON (no markdown, no code blocks) in exactly this format:\n" +
+            "{\"specialist\":\"Service Name\",\"reason\":\"1-2 sentence plain-English explanation for the patient.\"}";
+
+        string content = CallGpt(prompt, temp: 0.3, maxTokens: 150);
+
+        if (content == null)
+            return new SpecialistResult { Specialist = "General Practitioner", Reason = "Please book a General Practitioner appointment and they will refer you to the right specialist." };
+
+        // Strip optional markdown code fences
+        if (content.StartsWith("```")) {
+            int s = content.IndexOf('{'), e = content.LastIndexOf('}');
+            if (s >= 0 && e > s) content = content.Substring(s, e - s + 1);
+        }
+
+        try
+        {
+            var inner = (Dictionary<string, object>)Json.DeserializeObject(content);
+            return new SpecialistResult
+            {
+                Specialist = inner["specialist"].ToString(),
+                Reason     = inner["reason"].ToString()
+            };
+        }
+        catch
+        {
+            return new SpecialistResult { Specialist = "General Practitioner", Reason = content };
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Admin AI dashboard insights
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Given a plain-text summary of appointment statistics, returns a concise operational insight.
+    /// </summary>
+    public static string GetAdminInsights(string dataSummary)
+    {
+        string prompt =
+            "You are an AI analyst for Portmore Medical Center. " +
+            "Based on the following appointment statistics, provide 3-5 sentences of concise operational insight " +
+            "to help the admin team understand patient demand and prioritise resources:\n\n" +
+            dataSummary;
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 300)
+               ?? "AI insights are unavailable at this time.";
+    }
+
+    // -----------------------------------------------------------------------
+    // Contact form auto-reply draft
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Drafts a professional reply to a patient's contact form message on behalf of the clinic.
+    /// </summary>
+    public static string GetContactReply(string firstName, string patientMessage)
+    {
+        string prompt =
+            "Draft a short, professional, and warm email reply from Portmore Medical Center to a patient named " +
+            firstName + " who sent the following enquiry:\n\n\"" + patientMessage + "\"\n\n" +
+            "Acknowledge their message, be helpful and reassuring, and invite them to call or visit if needed. " +
+            "Sign off as 'The Portmore Medical Center Team'. Keep the reply under 120 words.";
+
+        return CallGpt(prompt, temp: 0.7, maxTokens: 200)
+               ?? "Thank you for contacting Portmore Medical Center. A member of our team will be in touch with you shortly.";
+    }
+
+    // -----------------------------------------------------------------------
+    // Daily health tip
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a daily health tip. Callers should cache this in Application state keyed by date.
+    /// </summary>
+    public static string GetHealthTip()
+    {
+        string date = DateTime.Now.ToString("MMMM d, yyyy");
+        string prompt =
+            "Generate one concise, practical, and positive health tip for patients of a medical center for today, " +
+            date + ". Make it actionable and 2-3 sentences long. " +
+            "Do not include a headline, bullet points, or any formatting — just the tip as plain prose.";
+
+        return CallGpt(prompt, temp: 0.8, maxTokens: 120)
+               ?? "Stay hydrated, get plenty of rest, and don't hesitate to book a check-up if you have any health concerns — early detection saves lives.";
+    }
+
+    // -----------------------------------------------------------------------
     // General site assistant (chat)
     // -----------------------------------------------------------------------
 
