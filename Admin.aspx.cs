@@ -19,7 +19,6 @@ public partial class admin : System.Web.UI.Page
             if (usercookie != null)
             {
                 TextBox1.Text = usercookie["emailaddress"].ToString();
-                TextBox2.Text = usercookie["password"].ToString();
                 RememberMe.Checked = true;
             }
             else
@@ -36,31 +35,29 @@ public partial class admin : System.Web.UI.Page
 
     protected void Button1_Click(object sender, EventArgs e)
     {
-
-        SqlConnection connection = connectionManager.GetMembersConnection();
-
-        SqlCommand myCommand = new SqlCommand();
-        myCommand.Connection = connection;
-        string Email = TextBox1.Text;
+        string Email    = TextBox1.Text;
         string Password = TextBox2.Text;
 
-        string insertSQL = "SELECT * FROM Admins WHERE Email=@Email AND password=@Password";
-        myCommand.CommandText = insertSQL;
-        myCommand.Parameters.AddWithValue("@Email", Email);
-        myCommand.Parameters.AddWithValue("@Password", Password);
-
-        SqlDataReader read = myCommand.ExecuteReader();
-
-        if (read.Read())
+        using (SqlConnection connection = connectionManager.GetMembersConnection())
+        using (SqlCommand myCommand = new SqlCommand("SELECT * FROM Admins WHERE Email=@Email AND password=@Password", connection))
         {
-            Session["FirstName"] = read["FirstName"].ToString();
-            Session["LastName"] = read["LastName"].ToString();
+            myCommand.Parameters.AddWithValue("@Email",    Email);
+            myCommand.Parameters.AddWithValue("@Password", Password);
 
-            Response.Redirect("AdminView.aspx");
-        }
-        else
-        {
-            Label1.Text = "Invalid email or password.";
+            using (SqlDataReader read = myCommand.ExecuteReader())
+            {
+                if (read.Read())
+                {
+                    Session["FirstName"] = read["FirstName"].ToString();
+                    Session["LastName"]  = read["LastName"].ToString();
+
+                    Response.Redirect("AdminView.aspx");
+                }
+                else
+                {
+                    Label1.Text = "Invalid email or password.";
+                }
+            }
         }
     }
 
@@ -70,7 +67,7 @@ public partial class admin : System.Web.UI.Page
     {
         HttpCookie userdata = new HttpCookie("data1");
         userdata["emailaddress"] = TextBox1.Text;
-        userdata["password"] = TextBox2.Text;
+        // Password is intentionally not stored in the cookie
         userdata.Expires = System.DateTime.Now.AddMinutes(10);
         Response.Cookies.Add(userdata);
     }

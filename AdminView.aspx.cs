@@ -9,6 +9,8 @@ public partial class AdminView : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["FirstName"] == null)
+            Response.Redirect("Admin.aspx");
     }
 
     protected void GridView4_SelectedIndexChanged(object sender, EventArgs e)
