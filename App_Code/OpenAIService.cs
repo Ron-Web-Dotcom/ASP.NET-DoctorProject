@@ -72,7 +72,7 @@ public static class OpenAIService
 
                 // Parse the outer OpenAI response envelope
                 var outer   = (Dictionary<string, object>)Json.DeserializeObject(responseJson);
-                var choices = (object[])outer["choices"];
+                var choices = (ArrayList)outer["choices"];
                 var choice  = (Dictionary<string, object>)choices[0];
                 var message = (Dictionary<string, object>)choice["message"];
                 string content = message["content"].ToString().Trim();

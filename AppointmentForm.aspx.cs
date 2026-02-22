@@ -34,32 +34,34 @@ public partial class RegisterationForm : System.Web.UI.Page
         OpenAIService.TriageResult triage = OpenAIService.GetTriage(
             FirstName, LastName, Age, Services, Issue);
 
-        SqlConnection connection = connectionManager.GetMembersConnection();
-        SqlCommand myCommand = new SqlCommand();
-        myCommand.Connection = connection;
+        using (SqlConnection connection = connectionManager.GetMembersConnection())
+        using (SqlCommand myCommand = new SqlCommand())
+        {
+            myCommand.Connection = connection;
 
-        string insertSQL =
-            "INSERT INTO [Appointments] " +
-            "(FirstName, Lastname, Age, Services, PhoneNum, Time, Email, Address1, Address2, City, Issue, AITriage, AINote) " +
-            "VALUES " +
-            "(@FirstName, @LastName, @Age, @Services, @PhoneNum, @Time, @Email, @Address1, @Address2, @City, @Issue, @AITriage, @AINote)";
+            string insertSQL =
+                "INSERT INTO [Appointments] " +
+                "(FirstName, Lastname, Age, Services, PhoneNum, Time, Email, Address1, Address2, City, Issue, AITriage, AINote) " +
+                "VALUES " +
+                "(@FirstName, @LastName, @Age, @Services, @PhoneNum, @Time, @Email, @Address1, @Address2, @City, @Issue, @AITriage, @AINote)";
 
-        myCommand.CommandText = insertSQL;
-        myCommand.Parameters.AddWithValue("@FirstName", FirstName);
-        myCommand.Parameters.AddWithValue("@LastName",  LastName);
-        myCommand.Parameters.AddWithValue("@Age",       Age);
-        myCommand.Parameters.AddWithValue("@Services",  Services);
-        myCommand.Parameters.AddWithValue("@PhoneNum",  PhoneNum);
-        myCommand.Parameters.AddWithValue("@Time",      Time);
-        myCommand.Parameters.AddWithValue("@Email",     Email);
-        myCommand.Parameters.AddWithValue("@Address1",  Address1);
-        myCommand.Parameters.AddWithValue("@Address2",  Address2);
-        myCommand.Parameters.AddWithValue("@City",      City);
-        myCommand.Parameters.AddWithValue("@Issue",     Issue);
-        myCommand.Parameters.AddWithValue("@AITriage",  triage.Triage);
-        myCommand.Parameters.AddWithValue("@AINote",    triage.Note);
+            myCommand.CommandText = insertSQL;
+            myCommand.Parameters.AddWithValue("@FirstName", FirstName);
+            myCommand.Parameters.AddWithValue("@LastName",  LastName);
+            myCommand.Parameters.AddWithValue("@Age",       Age);
+            myCommand.Parameters.AddWithValue("@Services",  Services);
+            myCommand.Parameters.AddWithValue("@PhoneNum",  PhoneNum);
+            myCommand.Parameters.AddWithValue("@Time",      Time);
+            myCommand.Parameters.AddWithValue("@Email",     Email);
+            myCommand.Parameters.AddWithValue("@Address1",  Address1);
+            myCommand.Parameters.AddWithValue("@Address2",  Address2);
+            myCommand.Parameters.AddWithValue("@City",      City);
+            myCommand.Parameters.AddWithValue("@Issue",     Issue);
+            myCommand.Parameters.AddWithValue("@AITriage",  triage.Triage);
+            myCommand.Parameters.AddWithValue("@AINote",    triage.Note);
 
-        myCommand.ExecuteNonQuery();
+            myCommand.ExecuteNonQuery();
+        }
     }
 
 
