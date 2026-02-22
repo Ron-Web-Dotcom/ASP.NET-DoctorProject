@@ -109,6 +109,23 @@
                             <ul class="dropdown-menu">
                                 <li><a href="AIChatAssistant.aspx"><span class="glyphicon glyphicon-comment"></span> AI Assistant</a></li>
                                 <li><a href="SymptomChecker.aspx"><span class="glyphicon glyphicon-search"></span> Symptom Checker</a></li>
+                                <li class="divider"></li>
+                                <li><a href="Questionnaire.aspx"><span class="glyphicon glyphicon-list-alt"></span> Pre-Appointment Questionnaire</a></li>
+                                <li><a href="CancelAppointment.aspx"><span class="glyphicon glyphicon-remove-circle"></span> Cancel / Reschedule</a></li>
+                            </ul>
+                        </li>
+                        <!-- Feature 4: Language toggle — translates current page content via TranslateHandler.ashx -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="LangToggle">
+                                <span class="glyphicon glyphicon-globe"></span> Language <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" id="LangMenu">
+                                <li><a href="#" class="lang-option" data-lang="English">English</a></li>
+                                <li><a href="#" class="lang-option" data-lang="Spanish">Spanish</a></li>
+                                <li><a href="#" class="lang-option" data-lang="French">French</a></li>
+                                <li><a href="#" class="lang-option" data-lang="Mandarin">Mandarin</a></li>
+                                <li><a href="#" class="lang-option" data-lang="Arabic">Arabic</a></li>
+                                <li><a href="#" class="lang-option" data-lang="Portuguese">Portuguese</a></li>
                             </ul>
                         </li>
                         <asp:LinkButton ID="LinkButton1" runat="server"><a href="SignIn2.aspx">Sign In</a></asp:LinkButton>
@@ -126,5 +143,58 @@
       </div>
 
     </form>
+
+<!-- Feature 4: Multi-language translation script
+     When the user selects a language from the Language dropdown:
+     1. All visible text nodes inside <main> content (or the whole body as fallback)
+        are collected into a single string.
+     2. The string is POSTed to TranslateHandler.ashx.
+     3. The returned translation replaces the inner HTML of the content area.
+     "English" reloads the page to restore the original server-rendered text.
+-->
+<script type="text/javascript">
+(function () {
+    // The element whose content will be translated (the content placeholder wrapper)
+    var contentArea = document.getElementById('ContentPlaceHolder1')
+                   || document.body;
+
+    document.getElementById('LangMenu').addEventListener('click', function (e) {
+        var target = e.target;
+        if (!target || !target.classList.contains('lang-option')) return;
+        e.preventDefault();
+
+        var lang = target.getAttribute('data-lang');
+        if (lang === 'English') { location.reload(); return; }
+
+        // Update the toggle label to show the active language
+        document.getElementById('LangToggle').childNodes[0].nodeValue = ' ' + lang + ' ';
+
+        // Collect all the visible text from the content area
+        var sourceText = contentArea.innerText || contentArea.textContent;
+        if (!sourceText || sourceText.trim().length === 0) return;
+
+        // POST to TranslateHandler.ashx
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'TranslateHandler.ashx', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4 || xhr.status !== 200) return;
+            try {
+                var data = JSON.parse(xhr.responseText);
+                if (data.translated) {
+                    // Wrap translated plain text in a <pre> to preserve layout
+                    contentArea.innerHTML =
+                        '<div style="white-space:pre-wrap;font-family:inherit;">' +
+                        data.translated.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') +
+                        '</div>';
+                }
+            } catch (ex) { /* ignore parse errors silently */ }
+        };
+        xhr.send('text=' + encodeURIComponent(sourceText.substring(0, 2000)) +
+                 '&language=' + encodeURIComponent(lang));
+    });
+}());
+</script>
+
 </body>
 </html>

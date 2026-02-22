@@ -18,6 +18,27 @@
 <center><h1><block>Portmore Medical Center Appointment Page</block></h1></center>
         </div>
          <div class="container">
+
+<!-- Confirmation panel — shown after successful booking -->
+<asp:Panel ID="PanelConfirmation" runat="server" Visible="false">
+  <div class="panel panel-success" style="margin:20px 0;">
+    <div class="panel-heading"><h3 class="panel-title">Appointment Confirmed!</h3></div>
+    <div class="panel-body">
+      <p>Thank you, <strong><asp:Label ID="LblConfirmName" runat="server" /></strong>!
+         Your <strong><asp:Label ID="LblConfirmService" runat="server" /></strong> appointment
+         at <strong><asp:Label ID="LblConfirmTime" runat="server" /></strong> has been booked.</p>
+      <hr />
+      <h4><span class="glyphicon glyphicon-heart"></span> Personalised Wellness Tips</h4>
+      <p style="white-space:pre-line;"><asp:Literal ID="LitWellnessTips" runat="server" /></p>
+      <a href="AppointmentForm.aspx" class="btn btn-default">Book Another Appointment</a>
+      &nbsp;
+      <a href="HomePage.aspx" class="btn btn-primary">Return to Home</a>
+    </div>
+  </div>
+</asp:Panel>
+
+<!-- Main booking form panel -->
+<asp:Panel ID="PanelForm" runat="server" Visible="true">
         <table class="nav-justified">
                  <tr>
                      <td style="width: 396px">FirstName :<asp:TextBox ID="TextBox1" runat="server" Width="248px"></asp:TextBox>
@@ -133,13 +154,20 @@
                      <td>&nbsp;</td>
                  </tr>
                  <tr>
+                     <td colspan="2">
+                         <asp:Label ID="LblDuplicate" runat="server" Visible="false"
+                             CssClass="alert alert-warning" style="display:block;margin-top:10px;" />
+                     </td>
+                 </tr>
+                 <tr>
                      <td style="width: 396px">
                          <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Submit" Width="135px" />
-<%--&nbsp;<asp:Button ID="Button2" runat="server" Text="Reset" Width="156px" OnClick="Button2_Click" />--%>
                      </td>
                      <td>&nbsp;</td>
                  </tr>
              </table>
+</asp:Panel><!-- /PanelForm -->
+
   <footer>
         <div class="container">
             <p class="pull-right"><a href="#">Go Back Upht"><a href="#">Go Back Up</a></p>
