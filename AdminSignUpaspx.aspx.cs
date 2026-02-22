@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -23,20 +23,20 @@ public partial class AdminSignUpaspx : System.Web.UI.Page
         myCommand.Connection = connection;
         string FirstName = TextBox1.Text;
         string LastName = TextBox2.Text;
-        string TypeOFUser= DropDownList1.SelectedValue;
+        string TypeOFUser = DropDownList1.SelectedValue;
         string Email = TextBox3.Text;
         string Password = TextBox4.Text;
         string Confirm = TextBox5.Text;
-          string insertSQL;
-           insertSQL = "INSERT INTO [Admins] (FirstName, LastName, TypeOFUser, Email, Password,Confirm) VALUES ('" + FirstName + "','" + LastName + "','" + TypeOFUser + "', '" + Email + "','" + Password+ "','" + Confirm +"')";
+
+        string insertSQL = "INSERT INTO [Admins] (FirstName, LastName, TypeOFUser, Email, Password, Confirm) VALUES (@FirstName, @LastName, @TypeOFUser, @Email, @Password, @Confirm)";
         myCommand.CommandText = insertSQL;
+        myCommand.Parameters.AddWithValue("@FirstName", FirstName);
+        myCommand.Parameters.AddWithValue("@LastName", LastName);
+        myCommand.Parameters.AddWithValue("@TypeOFUser", TypeOFUser);
+        myCommand.Parameters.AddWithValue("@Email", Email);
+        myCommand.Parameters.AddWithValue("@Password", Password);
+        myCommand.Parameters.AddWithValue("@Confirm", Confirm);
+
         myCommand.ExecuteNonQuery();
-       
-
     }
-    //    catch (SqlException)
-    //    {
-    //        //Label1.Text = "error";
-
-       }
-   
+}

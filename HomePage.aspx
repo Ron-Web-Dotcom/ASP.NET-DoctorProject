@@ -102,13 +102,20 @@
 						                <div class="panel-body">						             
 						                  
 											  
-					<center><h4>Health tip: Learn resilience to cope with life's obstacles</h4></center>
-<p><img alt="Happy Doctor" class="img-responsive-left" src="images/inderrrrrrrrrrrwwwwwx.jpg" width="50"/><span style="line-height: 2.5em;">Why do some people cope better than others with life’s inevitable challenges and blows? What is the secret to mental resilience?</span></p>
-<p>Experts view traumatic experiences as critical events that allow growth and transformation to a degree that can’t happen without them. <span style="line-height: 1.5em;">The ability to effectively handle adversity has attracted considerable research interest in recent years.</span>&nbsp; <a href="https://authoritynutrition.com/27-health-and-nutrition-tips/"title="Learn resilience to cope with life's obstacles">Learn more »</a></p>
+                <center>
+                    <h4>
+                        <span class="glyphicon glyphicon-heart" style="color:#c0392b;"></span>
+                        Today’s AI Health Tip
+                        <small style="font-size:11px;color:#aaa;margin-left:8px;">Updated daily &middot; Powered by GPT-4</small>
+                    </h4>
+                </center>
+<p>
+    <img alt="Doctor" class="img-responsive-left" src="images/inderrrrrrrrrrrwwwwwx.jpg" width="50"/>
+    <asp:Literal ID="LitHealthTip" runat="server" />
+</p>
 <ul>
-<li><a href="https://authoritynutrition.com/27-health-and-nutrition-tips/" title="Recent health tips">Portmore Medical health tips</a></li>
-<li><a href="https://www.facebook.com" title="Follow us on Facebook for health info" target="_blank">Receive more health info on our Facebook page</a></li>
-    
+<li><a href="SymptomChecker.aspx" title="AI Symptom Checker">Not sure which doctor to see? Try our AI Symptom Checker</a></li>
+<li><a href="AIChatAssistant.aspx" title="AI Assistant">Chat with our AI Assistant for clinic information</a></li>
 </ul>
 <p>&nbsp;</p>
 <div class="mcePaste" id="_mcePaste" style="position: absolute; width: 1px; height: 1px; overflow: hidden; top: -25px; left: -40px;"></div>
