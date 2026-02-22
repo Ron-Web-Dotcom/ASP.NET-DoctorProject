@@ -5,8 +5,20 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+/// <summary>
+/// Code-behind for the Admin Dashboard page (AdminView.aspx).
+/// Displays appointment data in a GridView, colour-codes rows by AI triage
+/// urgency level, and provides an AI-powered operational insights panel
+/// that summarises appointment statistics on demand.
+/// Access is restricted to authenticated administrators via session guard.
+/// </summary>
 public partial class AdminView : System.Web.UI.Page
 {
+    /// <summary>
+    /// Enforces authentication on every request.
+    /// If the admin session is absent the visitor is redirected to the
+    /// login page (Admin.aspx), preventing unauthorised access to the dashboard.
+    /// </summary>
     protected void Page_Load(object sender, EventArgs e)
     {
         if (Session["FirstName"] == null)
@@ -17,6 +29,13 @@ public partial class AdminView : System.Web.UI.Page
     {
     }
 
+    /// <summary>
+    /// Handles the Refresh Insights button click.
+    /// Builds a plain-text summary of current appointment statistics from the
+    /// database and passes it to OpenAIService.GetAdminInsights to generate
+    /// a concise AI-written operational analysis for the admin team.
+    /// The result is HTML-encoded before rendering to prevent XSS.
+    /// </summary>
     protected void BtnRefreshInsights_Click(object sender, EventArgs e)
     {
         string summary = BuildAppointmentSummary();
@@ -24,6 +43,13 @@ public partial class AdminView : System.Web.UI.Page
         LitInsights.Text = System.Web.HttpUtility.HtmlEncode(insight);
     }
 
+    /// <summary>
+    /// Queries the Appointments table to produce a plain-text statistical summary
+    /// covering total appointment count, a breakdown by service, and a breakdown
+    /// by AI triage level. This summary is sent to GPT-4 for analysis.
+    /// Returns a partial summary with an error note if the database query fails.
+    /// </summary>
+    /// <returns>A multi-line string containing appointment statistics.</returns>
     private string BuildAppointmentSummary()
     {
         var sb = new StringBuilder();
@@ -31,14 +57,14 @@ public partial class AdminView : System.Web.UI.Page
         {
             using (SqlConnection conn = connectionManager.GetMembersConnection())
             {
-                // Total appointments
+                // Total appointment count
                 using (var cmd = new SqlCommand("SELECT COUNT(*) FROM [Appointments]", conn))
                 {
                     int total = (int)cmd.ExecuteScalar();
                     sb.AppendLine("Total appointments: " + total);
                 }
 
-                // Breakdown by service
+                // Per-service breakdown, most popular first
                 sb.AppendLine("\nAppointments by service:");
                 using (var cmd = new SqlCommand("SELECT Services, COUNT(*) AS Cnt FROM [Appointments] GROUP BY Services ORDER BY Cnt DESC", conn))
                 using (var rdr = cmd.ExecuteReader())
@@ -47,7 +73,7 @@ public partial class AdminView : System.Web.UI.Page
                         sb.AppendLine("  " + rdr["Services"] + ": " + rdr["Cnt"]);
                 }
 
-                // Triage breakdown
+                // AI triage level breakdown (excludes rows with no triage value)
                 sb.AppendLine("\nAI Triage breakdown:");
                 using (var cmd = new SqlCommand("SELECT AITriage, COUNT(*) AS Cnt FROM [Appointments] WHERE AITriage IS NOT NULL GROUP BY AITriage ORDER BY Cnt DESC", conn))
                 using (var rdr = cmd.ExecuteReader())
@@ -66,8 +92,13 @@ public partial class AdminView : System.Web.UI.Page
     }
 
     /// <summary>
-    /// Colour-codes the AI Triage cell in the Appointments grid using Bootstrap contextual row classes.
-    /// Urgent = red, High = orange/warning, Medium = blue/info, Low = green.
+    /// Colour-codes the AI Triage cell (column index 6) of each data row in the
+    /// Appointments GridView using Bootstrap-compatible contextual colours:
+    ///   Urgent  — red background / dark-red text
+    ///   High    — amber background / dark-amber text
+    ///   Medium  — blue background / dark-blue text
+    ///   Low     — green background / dark-green text
+    /// Non-data rows (header, footer) are skipped.
     /// </summary>
     protected void GridView5_RowDataBound(object sender, GridViewRowEventArgs e)
     {

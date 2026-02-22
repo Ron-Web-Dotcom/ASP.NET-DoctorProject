@@ -8,6 +8,12 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
 
+/// <summary>
+/// Code-behind for the patient Contact Form page (ContactForm.aspx).
+/// Saves the patient's enquiry to the Contacts table and then uses the
+/// OpenAI service to generate a personalised draft reply, which is
+/// displayed in a thank-you panel after submission.
+/// </summary>
 public partial class Form : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
@@ -15,6 +21,14 @@ public partial class Form : System.Web.UI.Page
 
     }
 
+    /// <summary>
+    /// Handles the Submit button click.
+    /// Persists the contact enquiry to the database using parameterised queries
+    /// to prevent SQL injection, then calls OpenAIService.GetContactReply to
+    /// produce an AI-drafted response.
+    /// The form panel is hidden and a thank-you panel (with the AI reply) is
+    /// shown on success.
+    /// </summary>
     protected void Button1_Click(object sender, EventArgs e)
     {
         string FirstName = TextBox1.Text;
@@ -37,8 +51,9 @@ public partial class Form : System.Web.UI.Page
             myCommand.ExecuteNonQuery();
         }
 
-        // Generate AI-drafted reply and show thank-you panel
-        string aiReply = OpenAIService.GetContactReply(FirstName, Message);
+        // Ask GPT-4 to draft a personalised reply on behalf of the clinic.
+        // HtmlEncode prevents XSS if the AI response contains any HTML characters.
+        string aiReply        = OpenAIService.GetContactReply(FirstName, Message);
         LitAIReply.Text       = System.Web.HttpUtility.HtmlEncode(aiReply);
         PanelForm.Visible     = false;
         PanelThankyou.Visible = true;

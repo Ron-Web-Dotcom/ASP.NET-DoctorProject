@@ -8,6 +8,11 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
 
+/// <summary>
+/// Code-behind for the patient Appointment Form page (AppointmentForm.aspx).
+/// Collects patient intake details, runs an AI triage assessment via GPT-4,
+/// and saves the full record (including the triage result) to the Appointments table.
+/// </summary>
 public partial class RegisterationForm : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
@@ -15,7 +20,15 @@ public partial class RegisterationForm : System.Web.UI.Page
 
     }
 
-
+    /// <summary>
+    /// Handles the Book Appointment button click.
+    /// 1. Reads all patient intake fields from the form.
+    /// 2. Calls OpenAIService.GetTriage to obtain an AI urgency level and clinical note.
+    ///    If the AI call fails, GetTriage returns a safe fallback ("Error" / "Pending")
+    ///    so the form submission is never blocked by an API failure.
+    /// 3. Inserts the full record into the Appointments table using parameterised
+    ///    queries to prevent SQL injection.
+    /// </summary>
     protected void Button1_Click(object sender, EventArgs e)
     {
         string FirstName = TextBox1.Text;
@@ -30,7 +43,7 @@ public partial class RegisterationForm : System.Web.UI.Page
         string City      = TextBox7.Text;
         string Issue     = TextBox9.Text;
 
-        // AI triage: assess the patient's intake before saving
+        // Run GPT-4 triage before saving; falls back gracefully if the API is unavailable
         OpenAIService.TriageResult triage = OpenAIService.GetTriage(
             FirstName, LastName, Age, Services, Issue);
 
@@ -57,28 +70,38 @@ public partial class RegisterationForm : System.Web.UI.Page
             myCommand.Parameters.AddWithValue("@Address2",  Address2);
             myCommand.Parameters.AddWithValue("@City",      City);
             myCommand.Parameters.AddWithValue("@Issue",     Issue);
-            myCommand.Parameters.AddWithValue("@AITriage",  triage.Triage);
-            myCommand.Parameters.AddWithValue("@AINote",    triage.Note);
+            myCommand.Parameters.AddWithValue("@AITriage",  triage.Triage); // e.g. "Urgent", "High", "Medium", "Low", "Error"
+            myCommand.Parameters.AddWithValue("@AINote",    triage.Note);   // brief clinical pre-assessment
 
             myCommand.ExecuteNonQuery();
         }
     }
 
-
+    /// <summary>
+    /// Fires when the user selects a date on the calendar control.
+    /// Writes the selected date in long format to the date TextBox and hides the calendar.
+    /// </summary>
     protected void Calendar1_SelectionChanged(object sender, EventArgs e)
     {
-        TextBox10.Text = Calendar1.SelectedDate.ToLongDateString();
+        TextBox10.Text    = Calendar1.SelectedDate.ToLongDateString();
         Calendar1.Visible = false;
     }
 
+    /// <summary>
+    /// Handles the "Pick a date" button click — makes the calendar control visible.
+    /// </summary>
     protected void Button3_Click(object sender, EventArgs e)
     {
         Calendar1.Visible = true;
     }
 
+    /// <summary>
+    /// Alternative SelectionChanged handler that formats the date as "dd MMMM,yyyy"
+    /// and keeps the calendar visible after selection.
+    /// </summary>
     protected void Calendar1_SelectionChanged1(object sender, EventArgs e)
     {
-        TextBox10.Text = Calendar1.SelectedDate.ToString("dd MMMM,yyyy");
+        TextBox10.Text    = Calendar1.SelectedDate.ToString("dd MMMM,yyyy");
         Calendar1.Visible = true;
     }
 }

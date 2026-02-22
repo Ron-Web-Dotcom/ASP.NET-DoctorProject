@@ -4,6 +4,20 @@ using System;
 using System.Web;
 using System.Web.Script.Serialization;
 
+/// <summary>
+/// HTTP handler for the AI chat assistant (ChatHandler.ashx).
+/// Accepts POST requests from the AIChatAssistant.aspx front-end,
+/// forwards the message and optional conversation history to GPT-4 via
+/// OpenAIService.GetChatResponse, and returns a JSON response.
+///
+/// Expected form fields:
+///   message  — the user's latest chat message (required, max 1 000 chars)
+///   history  — JSON array of prior {role, content} turns (optional)
+///
+/// Response format:
+///   { "reply": "..." }   on success
+///   { "error": "..." }   on bad request
+/// </summary>
 public class ChatHandler : IHttpHandler
 {
     public void ProcessRequest(HttpContext context)
@@ -11,7 +25,7 @@ public class ChatHandler : IHttpHandler
         context.Response.ContentType = "application/json";
         context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
-        // Only accept POST
+        // Only accept POST to prevent accidental GET requests leaking data via URL
         if (!context.Request.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase))
         {
             context.Response.StatusCode = 405;
@@ -19,7 +33,7 @@ public class ChatHandler : IHttpHandler
             return;
         }
 
-        string userMessage    = context.Request.Form["message"];
+        string userMessage      = context.Request.Form["message"];
         string conversationJson = context.Request.Form["history"];  // optional prior turns
 
         if (string.IsNullOrWhiteSpace(userMessage))
@@ -28,7 +42,7 @@ public class ChatHandler : IHttpHandler
             return;
         }
 
-        // Limit message length to prevent abuse
+        // Truncate oversized messages to protect against abuse and excessive API cost
         if (userMessage.Length > 1000)
             userMessage = userMessage.Substring(0, 1000);
 
@@ -38,5 +52,9 @@ public class ChatHandler : IHttpHandler
         context.Response.Write(serializer.Serialize(new { reply = reply }));
     }
 
+    /// <summary>
+    /// Returns false so IIS creates a new handler instance per request,
+    /// avoiding shared state between concurrent chat sessions.
+    /// </summary>
     public bool IsReusable { get { return false; } }
 }
