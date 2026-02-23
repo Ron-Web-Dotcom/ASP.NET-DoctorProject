@@ -115,18 +115,41 @@ public partial class RegisterationForm : System.Web.UI.Page
         // Clear the questionnaire session flag now that the booking is complete
         Session.Remove("QuestionnaireSummary");
 
-        // Feature 2: Wellness tips — show after successful booking
+        // Feature 2: Wellness tips
         string tips = OpenAIService.GetWellnessTips(Services, Issue);
-        LitWellnessTips.Text = System.Web.HttpUtility.HtmlEncode(tips)
-                                     .Replace("&#10;", "<br />")  // newline → <br>
-                                     .Replace("• ",    "• ");     // keep bullet bullets
+        LitWellnessTips.Text = System.Web.HttpUtility.HtmlEncode(tips);
+
+        // Feature 4: Readiness checklist
+        string checklist = OpenAIService.GetReadinessChecklist(Services);
+        LitReadinessChecklist.Text = System.Web.HttpUtility.HtmlEncode(checklist);
+
+        // Feature 5: Patient education card
+        string eduCard = OpenAIService.GetPatientEducationCard(Services);
+        LitEducationCard.Text = System.Web.HttpUtility.HtmlEncode(eduCard);
 
         // Show confirmation panel, hide the form
-        PanelForm.Visible        = false;
+        PanelForm.Visible         = false;
         PanelConfirmation.Visible = true;
-        LblConfirmName.Text      = System.Web.HttpUtility.HtmlEncode(FirstName + " " + LastName);
-        LblConfirmService.Text   = System.Web.HttpUtility.HtmlEncode(Services);
-        LblConfirmTime.Text      = System.Web.HttpUtility.HtmlEncode(Time);
+        LblConfirmName.Text       = System.Web.HttpUtility.HtmlEncode(FirstName + " " + LastName);
+        LblConfirmService.Text    = System.Web.HttpUtility.HtmlEncode(Services);
+        LblConfirmTime.Text       = System.Web.HttpUtility.HtmlEncode(Time);
+        LblEduService.Text        = System.Web.HttpUtility.HtmlEncode(Services);
+    }
+
+    /// <summary>
+    /// Handles the "Suggest Best Time" button click (Feature 1 — Smart Time Slot Recommender).
+    /// Reads the currently selected service and any reason already typed, then asks
+    /// GPT-4 which time slot is most suitable. Shows the suggestion inline without
+    /// clearing the rest of the form.
+    /// </summary>
+    protected void BtnSuggestTime_Click(object sender, EventArgs e)
+    {
+        string service = DropDownList1.SelectedValue;
+        string reason  = TextBox9.Text.Trim();
+
+        string suggestion = OpenAIService.GetTimeSlotRecommendation(service, reason);
+        LitTimeSuggestion.Text      = System.Web.HttpUtility.HtmlEncode(suggestion);
+        PanelTimeSuggestion.Visible = true;
     }
 
     /// <summary>

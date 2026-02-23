@@ -223,8 +223,8 @@
       </div>
     </div>
 
-    <!-- ===== Feature 8: Doctor's Note Simplifier ===== -->
-    <div class="panel panel-default" style="margin-top:20px; margin-bottom:40px;">
+    <!-- ===== Feature 8 (existing): Doctor's Note Simplifier ===== -->
+    <div class="panel panel-default" style="margin-top:20px;">
       <div class="panel-heading">
         <h4 class="panel-title">
           <span class="glyphicon glyphicon-edit"></span>
@@ -247,6 +247,159 @@
           </div>
         </asp:Panel>
       </div>
+    </div>
+
+    <!-- ===== New Feature 6: Weekly Demand Forecast ===== -->
+    <div class="panel panel-info" style="margin-top:20px;">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <span class="glyphicon glyphicon-calendar"></span>
+          Weekly Demand Forecast
+          <asp:Button ID="BtnForecast" runat="server" Text="Generate Forecast" CssClass="btn btn-xs btn-default pull-right"
+                      OnClick="BtnForecast_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          GPT-4 analyses current booking data and predicts next week's demand by service to help plan staffing.
+        </p>
+        <asp:Panel ID="PanelForecast" runat="server" Visible="false">
+          <div class="alert alert-info" style="white-space:pre-wrap;">
+            <asp:Literal ID="LitForecast" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== New Feature 7: Referral Letter Drafter ===== -->
+    <div class="panel panel-default" style="margin-top:20px;">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <span class="glyphicon glyphicon-file"></span>
+          AI Referral Letter Drafter
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          Fill in the details below and GPT-4 will draft a formal inter-department referral letter.
+        </p>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:12px;">Patient Full Name</label>
+              <asp:TextBox ID="TxtRefPatient" runat="server" CssClass="form-control input-sm" placeholder="e.g. John Smith" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:12px;">Referring Doctor's Name</label>
+              <asp:TextBox ID="TxtRefDoctor" runat="server" CssClass="form-control input-sm" placeholder="e.g. Dr. Adams" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:12px;">From Department</label>
+              <asp:DropDownList ID="DdlRefFrom" runat="server" CssClass="form-control input-sm">
+                <asp:ListItem>General Practitioner</asp:ListItem>
+                <asp:ListItem>Cardiology</asp:ListItem>
+                <asp:ListItem>Gynaecology</asp:ListItem>
+                <asp:ListItem>Opticology</asp:ListItem>
+                <asp:ListItem>Paediatrics</asp:ListItem>
+                <asp:ListItem>Radiology</asp:ListItem>
+                <asp:ListItem>Surgery</asp:ListItem>
+              </asp:DropDownList>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:12px;">To Department</label>
+              <asp:DropDownList ID="DdlRefTo" runat="server" CssClass="form-control input-sm">
+                <asp:ListItem>Cardiology</asp:ListItem>
+                <asp:ListItem>General Practitioner</asp:ListItem>
+                <asp:ListItem>Gynaecology</asp:ListItem>
+                <asp:ListItem>Opticology</asp:ListItem>
+                <asp:ListItem>Paediatrics</asp:ListItem>
+                <asp:ListItem>Radiology</asp:ListItem>
+                <asp:ListItem>Surgery</asp:ListItem>
+              </asp:DropDownList>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label style="font-size:12px;">Reason for Referral</label>
+              <asp:TextBox ID="TxtRefReason" runat="server" TextMode="MultiLine" Rows="2"
+                           CssClass="form-control input-sm" placeholder="Brief clinical reason for referral..." />
+            </div>
+          </div>
+        </div>
+        <asp:Button ID="BtnReferralLetter" runat="server" Text="Draft Letter" CssClass="btn btn-primary btn-sm"
+                    OnClick="BtnReferralLetter_Click" />
+        <asp:Panel ID="PanelReferralLetter" runat="server" Visible="false" style="margin-top:15px;">
+          <div class="well well-sm" style="white-space:pre-wrap; font-family:monospace; font-size:13px;">
+            <asp:Literal ID="LitReferralLetter" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== New Feature 8b: Complaint Escalation Handler ===== -->
+    <div class="panel panel-danger" style="margin-top:20px;">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <span class="glyphicon glyphicon-warning-sign"></span>
+          Complaint Escalation Handler
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          Paste a distressed patient message below and GPT-4 will draft a formal, empathetic complaint response.
+        </p>
+        <div class="form-inline" style="margin-bottom:10px;">
+          <label>Patient First Name:&nbsp;</label>
+          <asp:TextBox ID="TxtComplaintFirst" runat="server" CssClass="form-control input-sm"
+                       placeholder="e.g. Mary" style="width:140px;" />
+        </div>
+        <asp:TextBox ID="TxtComplaint" runat="server" TextMode="MultiLine" Rows="4"
+                     CssClass="form-control" placeholder="Paste the patient's complaint or distressed message here..." />
+        <br />
+        <asp:Button ID="BtnComplaintResponse" runat="server" Text="Draft Complaint Response"
+                    CssClass="btn btn-danger btn-sm" OnClick="BtnComplaintResponse_Click" />
+        <asp:Panel ID="PanelComplaintResponse" runat="server" Visible="false" style="margin-top:15px;">
+          <div class="well well-sm" style="white-space:pre-wrap; font-family:monospace; font-size:13px;">
+            <asp:Literal ID="LitComplaintResponse" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== New Feature 10: Monthly Health Newsletter Generator ===== -->
+    <div class="panel panel-success" style="margin-top:20px; margin-bottom:30px;">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <span class="glyphicon glyphicon-send"></span>
+          Monthly Health Newsletter Generator
+          <asp:Button ID="BtnNewsletter" runat="server" Text="Generate Newsletter" CssClass="btn btn-xs btn-default pull-right"
+                      OnClick="BtnNewsletter_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          GPT-4 reads this month's top services from the database and generates a ready-to-send patient newsletter.
+        </p>
+        <asp:Panel ID="PanelNewsletter" runat="server" Visible="false">
+          <div class="well" style="white-space:pre-wrap; font-size:14px; line-height:1.7;">
+            <asp:Literal ID="LitNewsletter" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- Quick link to Staff Bio Generator -->
+    <div class="alert alert-info" style="margin-bottom:40px;">
+      <span class="glyphicon glyphicon-user"></span>
+      &nbsp;<strong>Staff Bio Generator:</strong>
+      Create polished doctor biographies for the website.
+      <a href="StaffBioGenerator.aspx" class="btn btn-info btn-sm pull-right">Open Bio Generator</a>
     </div>
 
  </div>

@@ -111,6 +111,9 @@
                                 <li><a href="SymptomChecker.aspx"><span class="glyphicon glyphicon-search"></span> Symptom Checker</a></li>
                                 <li class="divider"></li>
                                 <li><a href="Questionnaire.aspx"><span class="glyphicon glyphicon-list-alt"></span> Pre-Appointment Questionnaire</a></li>
+                                <li><a href="MedicationChecker.aspx"><span class="glyphicon glyphicon-plus-sign"></span> Medication Checker</a></li>
+                                <li><a href="SymptomDiary.aspx"><span class="glyphicon glyphicon-pencil"></span> Symptom Diary</a></li>
+                                <li class="divider"></li>
                                 <li><a href="CancelAppointment.aspx"><span class="glyphicon glyphicon-remove-circle"></span> Cancel / Reschedule</a></li>
                             </ul>
                         </li>

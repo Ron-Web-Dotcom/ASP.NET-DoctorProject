@@ -22,14 +22,30 @@
 <!-- Confirmation panel — shown after successful booking -->
 <asp:Panel ID="PanelConfirmation" runat="server" Visible="false">
   <div class="panel panel-success" style="margin:20px 0;">
-    <div class="panel-heading"><h3 class="panel-title">Appointment Confirmed!</h3></div>
+    <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-ok"></span> Appointment Confirmed!</h3></div>
     <div class="panel-body">
       <p>Thank you, <strong><asp:Label ID="LblConfirmName" runat="server" /></strong>!
          Your <strong><asp:Label ID="LblConfirmService" runat="server" /></strong> appointment
          at <strong><asp:Label ID="LblConfirmTime" runat="server" /></strong> has been booked.</p>
-      <hr />
-      <h4><span class="glyphicon glyphicon-heart"></span> Personalised Wellness Tips</h4>
-      <p style="white-space:pre-line;"><asp:Literal ID="LitWellnessTips" runat="server" /></p>
+
+      <!-- Feature 5: Patient Education Card -->
+      <div class="alert alert-info" style="margin-top:15px;">
+        <h4><span class="glyphicon glyphicon-info-sign"></span> About Your <asp:Label ID="LblEduService" runat="server" /> Appointment</h4>
+        <p style="white-space:pre-line; margin-bottom:0;"><asp:Literal ID="LitEducationCard" runat="server" /></p>
+      </div>
+
+      <!-- Feature 4: Readiness Checklist -->
+      <div class="alert alert-warning" style="margin-top:10px;">
+        <h4><span class="glyphicon glyphicon-check"></span> Your Preparation Checklist</h4>
+        <p style="white-space:pre-line; margin-bottom:0;"><asp:Literal ID="LitReadinessChecklist" runat="server" /></p>
+      </div>
+
+      <!-- Feature 2: Wellness Tips -->
+      <div class="alert alert-success" style="margin-top:10px;">
+        <h4><span class="glyphicon glyphicon-heart"></span> Personalised Wellness Tips</h4>
+        <p style="white-space:pre-line; margin-bottom:0;"><asp:Literal ID="LitWellnessTips" runat="server" /></p>
+      </div>
+
       <a href="AppointmentForm.aspx" class="btn btn-default">Book Another Appointment</a>
       &nbsp;
       <a href="HomePage.aspx" class="btn btn-primary">Return to Home</a>
@@ -55,6 +71,20 @@
                              <asp:ListItem>Surgeon</asp:ListItem>
                          </asp:DropDownList>
                      </td>
+                 </tr>
+                 <!-- Feature 1: Smart Time Slot Recommender -->
+                 <tr>
+                   <td colspan="2" style="padding:6px 0;">
+                     <asp:Button ID="BtnSuggestTime" runat="server" Text="&#10024; Suggest Best Time for Me"
+                         CssClass="btn btn-info btn-sm" CausesValidation="false"
+                         OnClick="BtnSuggestTime_Click" />
+                     <asp:Panel ID="PanelTimeSuggestion" runat="server" Visible="false">
+                       <div class="alert alert-info" style="margin-top:8px; margin-bottom:0; padding:8px 12px;">
+                         <span class="glyphicon glyphicon-time"></span>&nbsp;
+                         <asp:Literal ID="LitTimeSuggestion" runat="server" />
+                       </div>
+                     </asp:Panel>
+                   </td>
                  </tr>
                  <tr>
                      <td style="width: 396px">&nbsp;</td>

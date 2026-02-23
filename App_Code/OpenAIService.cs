@@ -605,9 +605,6 @@ public static class OpenAIService
     /// Translates a block of plain text into the specified target language.
     /// Used by TranslateHandler.ashx to power the multi-language toggle on key pages.
     /// </summary>
-    /// <param name="text">The source text to translate (English).</param>
-    /// <param name="targetLanguage">Target language name (e.g. "Spanish", "French", "Mandarin").</param>
-    /// <returns>The translated text, or the original text if translation fails.</returns>
     public static string TranslateText(string text, string targetLanguage)
     {
         if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(targetLanguage))
@@ -619,5 +616,328 @@ public static class OpenAIService
             text;
 
         return CallGpt(prompt, temp: 0.2, maxTokens: 600) ?? text;
+    }
+
+    // -----------------------------------------------------------------------
+    // 15. Smart Time Slot Recommender (new Feature 1)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Recommends the best available time slot for a patient based on the
+    /// service they are booking and any urgency they have described.
+    /// The suggestion is advisory only — the patient still picks from the dropdown.
+    /// </summary>
+    /// <param name="service">Clinic service selected (e.g. "Cardiology").</param>
+    /// <param name="urgency">Brief urgency or symptom description (may be empty).</param>
+    /// <returns>2-3 sentence recommendation as plain text.</returns>
+    public static string GetTimeSlotRecommendation(string service, string urgency)
+    {
+        string prompt =
+            "A patient at Portmore Medical Center is booking a " + service + " appointment." +
+            (string.IsNullOrWhiteSpace(urgency) ? "" : " They describe their concern as: \"" + urgency + "\".") + "\n\n" +
+            "Based on best practices for " + service + " appointments, recommend which time of day is " +
+            "most suitable for them (from the options: 8am–9am, 9am–10am, 11am–12pm, 12pm–1pm, " +
+            "1pm–2pm, 2pm–3pm, 3pm–4pm, 4pm–5pm) and briefly explain why in 2-3 friendly sentences. " +
+            "Output plain text only.";
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 150)
+               ?? "Morning slots (8am–10am) are generally best for specialist appointments as doctors " +
+                  "are freshest and less likely to be running behind. Consider an early slot if possible.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 16. Medication Interaction Checker (new Feature 2)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Reviews a list of medications and flags any well-known interactions,
+    /// including a clear disclaimer that this is educational information only
+    /// and not a substitute for professional medical advice.
+    /// </summary>
+    /// <param name="medications">Comma-separated list of medication names.</param>
+    /// <returns>Plain-text analysis with interaction notes and disclaimer.</returns>
+    public static string CheckMedicationInteractions(string medications)
+    {
+        string prompt =
+            "A patient at Portmore Medical Center has listed the following medications they are currently taking:\n\n" +
+            medications + "\n\n" +
+            "Review these medications and:\n" +
+            "1. List any well-known interactions between them (if any).\n" +
+            "2. Note any medications that commonly require monitoring or have important dietary restrictions.\n" +
+            "3. Advise the patient to discuss all medications with their doctor at their appointment.\n\n" +
+            "Begin your response with: 'IMPORTANT: This is general educational information only and does " +
+            "not replace advice from your doctor or pharmacist.'\n\n" +
+            "Use plain English, no jargon. Keep it concise but thorough. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.2, maxTokens: 400)
+               ?? "IMPORTANT: This is general educational information only and does not replace advice " +
+                  "from your doctor or pharmacist.\n\nWe were unable to analyse your medications at this time. " +
+                  "Please bring a complete list to your appointment and discuss with your doctor.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 17. Symptom Diary Analyser (new Feature 3)
+    // -----------------------------------------------------------------------
+
+    /// <summary>Result of a symptom diary analysis.</summary>
+    public class SymptomDiaryResult
+    {
+        /// <summary>2-4 sentence trend summary of the patient's symptom progression.</summary>
+        public string Summary        { get; set; }
+        /// <summary>Plain-English recommendation: monitor / see GP soon / seek urgent care.</summary>
+        public string Recommendation { get; set; }
+    }
+
+    /// <summary>
+    /// Analyses a patient's multi-day symptom log and returns a trend summary
+    /// plus a recommendation on urgency of care.
+    /// </summary>
+    /// <param name="diaryText">Free-text symptom log (one entry per line, newest last).</param>
+    public static SymptomDiaryResult AnalyseSymptomDiary(string diaryText)
+    {
+        string prompt =
+            "A patient has kept a symptom diary. Analyse the progression and provide a plain-English " +
+            "trend summary and a recommendation.\n\n" +
+            "Diary entries (oldest first):\n" + diaryText + "\n\n" +
+            "Respond with ONLY valid JSON (no markdown) in exactly this format:\n" +
+            "{\"summary\":\"2-4 sentence trend analysis.\",\"recommendation\":\"One clear sentence advising monitor / see GP soon / seek urgent care.\"}";
+
+        string content = CallGpt(prompt, temp: 0.3, maxTokens: 250);
+        if (content == null)
+            return new SymptomDiaryResult
+            {
+                Summary        = "Unable to analyse diary at this time.",
+                Recommendation = "Please bring your diary to your next appointment."
+            };
+
+        content = StripCodeFences(content);
+        try
+        {
+            var inner = (System.Collections.Generic.Dictionary<string, object>)
+                        new JavaScriptSerializer().DeserializeObject(content);
+            return new SymptomDiaryResult
+            {
+                Summary        = inner["summary"].ToString(),
+                Recommendation = inner["recommendation"].ToString()
+            };
+        }
+        catch
+        {
+            return new SymptomDiaryResult { Summary = content, Recommendation = "Please discuss with your doctor." };
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 18. AI Readiness Checklist (new Feature 4)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a personalised "what to bring / what to do before your visit"
+    /// checklist tailored to the specific clinic service the patient booked.
+    /// Displayed on the appointment confirmation panel.
+    /// </summary>
+    /// <param name="service">The clinic service booked (e.g. "Radiology").</param>
+    /// <returns>Bullet-point checklist as plain text (each item starts with "• ").</returns>
+    public static string GetReadinessChecklist(string service)
+    {
+        string prompt =
+            "A patient at Portmore Medical Center has just booked a " + service + " appointment. " +
+            "Generate a concise, practical checklist of 4-6 things they should do or bring " +
+            "to be fully prepared for their visit.\n\n" +
+            "Format each item on its own line starting with '• '. " +
+            "Examples: bring ID, bring insurance card, fast for X hours, wear comfortable clothing, " +
+            "bring list of medications, arrive 10 minutes early. " +
+            "Tailor the items specifically to a " + service + " appointment. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 200)
+               ?? "• Bring a valid photo ID and any insurance documentation.\n" +
+                  "• Arrive 10 minutes early to complete any paperwork.\n" +
+                  "• Bring a list of your current medications and dosages.\n" +
+                  "• Write down any questions you want to ask the doctor.\n" +
+                  "• Wear comfortable, loose-fitting clothing.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 19. Patient Education Card (new Feature 5)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a short plain-English overview of the patient's booked service —
+    /// what to expect, common procedures, and how to get the most from the appointment.
+    /// Displayed on the confirmation panel alongside wellness tips.
+    /// </summary>
+    /// <param name="service">The clinic service booked (e.g. "Cardiology").</param>
+    /// <returns>2-4 paragraph educational overview as plain text.</returns>
+    public static string GetPatientEducationCard(string service)
+    {
+        string prompt =
+            "Write a short, friendly, plain-English overview of what a patient can expect from " +
+            "a " + service + " appointment at a medical center. Cover:\n" +
+            "1. What the specialty focuses on.\n" +
+            "2. What typically happens during the appointment (in simple terms).\n" +
+            "3. One tip for getting the most out of the visit.\n\n" +
+            "Keep it to 3-4 short paragraphs. Warm and reassuring tone. Plain text only — no headings, no bullet points.";
+
+        return CallGpt(prompt, temp: 0.6, maxTokens: 300)
+               ?? "Your appointment has been confirmed with our specialist team. They will conduct " +
+                  "a thorough assessment and discuss any findings with you. Don't hesitate to ask " +
+                  "questions — your health team is here to help you.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 20. Weekly Demand Forecast (new Feature 6 admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Given a data summary of recent appointment bookings, predicts which services
+    /// and days are likely to be busiest in the coming week so admin can plan staffing.
+    /// </summary>
+    /// <param name="dataSummary">Plain-text summary of recent appointment counts by service.</param>
+    /// <returns>3-5 sentence operational forecast as plain text.</returns>
+    public static string GetWeeklyDemandForecast(string dataSummary)
+    {
+        string prompt =
+            "You are a healthcare operations analyst for Portmore Medical Center. " +
+            "Based on the following recent appointment booking data, predict demand for the coming week. " +
+            "Identify which services are likely to be busiest, suggest optimal staffing focus areas, " +
+            "and flag any patterns worth monitoring. Keep the forecast to 4-6 sentences.\n\n" +
+            "Recent data:\n" + dataSummary;
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 300)
+               ?? "Demand forecast is unavailable at this time. Please check back later.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 21. AI Referral Letter Drafter (new Feature 7 admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Drafts a formal inter-department referral letter from one clinic service
+    /// to another, ready for the admin team to print and sign.
+    /// </summary>
+    /// <param name="patientName">Full name of the patient.</param>
+    /// <param name="referringDoctor">Name of the referring doctor.</param>
+    /// <param name="fromDepartment">Department making the referral (e.g. "General Practitioner").</param>
+    /// <param name="toDepartment">Department being referred to (e.g. "Cardiology").</param>
+    /// <param name="reason">Clinical reason for the referral.</param>
+    /// <returns>A formal referral letter as plain text.</returns>
+    public static string GetReferralLetter(string patientName, string referringDoctor,
+        string fromDepartment, string toDepartment, string reason)
+    {
+        string prompt =
+            "Draft a formal medical referral letter from Portmore Medical Center.\n\n" +
+            "From: Dr. " + referringDoctor + ", " + fromDepartment + " Department\n" +
+            "To: " + toDepartment + " Department\n" +
+            "Patient: " + patientName + "\n" +
+            "Reason for referral: " + reason + "\n\n" +
+            "The letter should: be formally structured, briefly summarise the clinical reason, " +
+            "request appropriate assessment, and be professional in tone. " +
+            "Include today's date (" + DateTime.Now.ToString("MMMM d, yyyy") + "). " +
+            "Sign off as Dr. " + referringDoctor + ". Plain text only, no HTML.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 350)
+               ?? "Dear " + toDepartment + " Team,\n\nI am writing to refer " + patientName +
+                  " for assessment. " + reason + "\n\nKind regards,\nDr. " + referringDoctor +
+                  "\n" + fromDepartment + " Department, Portmore Medical Center";
+    }
+
+    // -----------------------------------------------------------------------
+    // 22. Complaint Escalation Handler (new Feature 8 admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Drafts a formal, empathetic response to a patient complaint or distressed
+    /// contact message. Designed to de-escalate and reassure the patient while
+    /// maintaining a professional clinic voice.
+    /// </summary>
+    /// <param name="firstName">Patient's first name.</param>
+    /// <param name="complaint">The patient's original complaint or message.</param>
+    /// <returns>A formal complaint response as plain text.</returns>
+    public static string GetComplaintResponse(string firstName, string complaint)
+    {
+        string prompt =
+            "A patient named " + firstName + " has submitted the following complaint or distressed message " +
+            "to Portmore Medical Center:\n\n\"" + complaint + "\"\n\n" +
+            "Draft a formal, empathetic, and professional response that:\n" +
+            "1. Acknowledges the patient's concern without admitting fault\n" +
+            "2. Apologises for any distress caused\n" +
+            "3. Explains that their concern will be reviewed by the appropriate team\n" +
+            "4. Provides a contact number placeholder ([phone]) for follow-up\n" +
+            "5. Is warm but professional in tone\n\n" +
+            "Sign off as 'Patient Experience Team, Portmore Medical Center'. " +
+            "Keep under 150 words. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 250)
+               ?? "Dear " + firstName + ",\n\nThank you for bringing this to our attention. " +
+                  "We are sorry to hear about your experience and take all feedback very seriously. " +
+                  "A member of our patient experience team will be in contact with you shortly.\n\n" +
+                  "Patient Experience Team, Portmore Medical Center";
+    }
+
+    // -----------------------------------------------------------------------
+    // 23. Staff Bio Generator (new Feature 9 admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a polished professional biography for a new doctor or staff member
+    /// based on brief bullet-point details provided by admin. Ready to publish on
+    /// the staff profile page.
+    /// </summary>
+    /// <param name="name">Doctor's full name.</param>
+    /// <param name="specialty">Their medical specialty.</param>
+    /// <param name="qualifications">Degrees and certifications (comma-separated).</param>
+    /// <param name="yearsExperience">Years of experience.</param>
+    /// <param name="extraDetails">Any other details (research, interests, languages, etc.).</param>
+    /// <returns>A 2-3 paragraph professional biography as plain text.</returns>
+    public static string GetStaffBio(string name, string specialty,
+        string qualifications, string yearsExperience, string extraDetails)
+    {
+        string prompt =
+            "Write a polished, professional 2-3 paragraph biography for a doctor at Portmore Medical Center.\n\n" +
+            "Name: Dr. " + name + "\n" +
+            "Specialty: " + specialty + "\n" +
+            "Qualifications: " + qualifications + "\n" +
+            "Years of experience: " + yearsExperience + "\n" +
+            "Additional details: " + (string.IsNullOrWhiteSpace(extraDetails) ? "None provided" : extraDetails) + "\n\n" +
+            "Write in third person. Warm, professional, and engaging tone. " +
+            "Suitable for publishing on a medical center website. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.6, maxTokens: 300)
+               ?? "Dr. " + name + " is a specialist in " + specialty + " at Portmore Medical Center " +
+                  "with " + yearsExperience + " years of experience. " +
+                  "They hold the following qualifications: " + qualifications + ". " +
+                  "Dr. " + name + " is committed to providing the highest quality patient care.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 24. Monthly Health Newsletter Generator (new Feature 10 admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a patient-facing monthly health newsletter based on the top
+    /// services booked that month. Suitable for copying into an email campaign.
+    /// </summary>
+    /// <param name="month">The month and year (e.g. "February 2026").</param>
+    /// <param name="topServicesData">Plain-text summary of top booked services with counts.</param>
+    /// <returns>A complete newsletter as plain text.</returns>
+    public static string GetMonthlyNewsletter(string month, string topServicesData)
+    {
+        string prompt =
+            "Write a short, friendly monthly health newsletter for patients of Portmore Medical Center " +
+            "for " + month + ".\n\n" +
+            "Top booked services this month:\n" + topServicesData + "\n\n" +
+            "The newsletter should:\n" +
+            "1. Open with a warm greeting and the month/year\n" +
+            "2. Highlight 2-3 health tips relevant to the most popular services this month\n" +
+            "3. Include a reminder to book appointments early\n" +
+            "4. Close warmly, signed from 'The Portmore Medical Center Team'\n\n" +
+            "Keep it under 250 words. Friendly, supportive tone. Plain text only — no HTML.";
+
+        return CallGpt(prompt, temp: 0.7, maxTokens: 400)
+               ?? "Dear Portmore Medical Center Patients,\n\n" +
+                  "Thank you for choosing us for your healthcare this " + month + ". " +
+                  "We hope you are keeping well. Remember to book your appointments early " +
+                  "to secure your preferred time slot.\n\n" +
+                  "The Portmore Medical Center Team";
     }
 }

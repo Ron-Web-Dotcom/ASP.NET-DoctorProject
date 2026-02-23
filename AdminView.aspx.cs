@@ -191,6 +191,99 @@ public partial class AdminView : System.Web.UI.Page
     }
 
     // -----------------------------------------------------------------------
+    // New Feature 6: Weekly Demand Forecast
+    // -----------------------------------------------------------------------
+
+    protected void BtnForecast_Click(object sender, EventArgs e)
+    {
+        string summary   = BuildAppointmentSummary();
+        string forecast  = OpenAIService.GetWeeklyDemandForecast(summary);
+        LitForecast.Text = System.Web.HttpUtility.HtmlEncode(forecast);
+        PanelForecast.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // New Feature 7: Referral Letter Drafter
+    // -----------------------------------------------------------------------
+
+    protected void BtnReferralLetter_Click(object sender, EventArgs e)
+    {
+        string patient  = TxtRefPatient.Text.Trim();
+        string doctor   = TxtRefDoctor.Text.Trim();
+        string fromDept = DdlRefFrom.SelectedValue;
+        string toDept   = DdlRefTo.SelectedValue;
+        string reason   = TxtRefReason.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(patient) || string.IsNullOrWhiteSpace(doctor) ||
+            string.IsNullOrWhiteSpace(reason))
+        {
+            LitReferralLetter.Text      = "Please fill in patient name, doctor name, and reason.";
+            PanelReferralLetter.Visible = true;
+            return;
+        }
+
+        string letter               = OpenAIService.GetReferralLetter(patient, doctor, fromDept, toDept, reason);
+        LitReferralLetter.Text      = System.Web.HttpUtility.HtmlEncode(letter);
+        PanelReferralLetter.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // New Feature 8b: Complaint Escalation Handler
+    // -----------------------------------------------------------------------
+
+    protected void BtnComplaintResponse_Click(object sender, EventArgs e)
+    {
+        string firstName = TxtComplaintFirst.Text.Trim();
+        string complaint = TxtComplaint.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(complaint))
+        {
+            LitComplaintResponse.Text      = "Please paste the patient's message first.";
+            PanelComplaintResponse.Visible = true;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(firstName)) firstName = "Patient";
+
+        string response                = OpenAIService.GetComplaintResponse(firstName, complaint);
+        LitComplaintResponse.Text      = System.Web.HttpUtility.HtmlEncode(response);
+        PanelComplaintResponse.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // New Feature 10: Monthly Newsletter Generator
+    // -----------------------------------------------------------------------
+
+    protected void BtnNewsletter_Click(object sender, EventArgs e)
+    {
+        string month   = DateTime.Now.ToString("MMMM yyyy");
+        string topData = BuildTopServicesThisMonth();
+        string letter  = OpenAIService.GetMonthlyNewsletter(month, topData);
+        LitNewsletter.Text      = System.Web.HttpUtility.HtmlEncode(letter);
+        PanelNewsletter.Visible = true;
+    }
+
+    private string BuildTopServicesThisMonth()
+    {
+        var sb = new System.Text.StringBuilder();
+        try
+        {
+            using (SqlConnection conn = connectionManager.GetMembersConnection())
+            using (var cmd = new SqlCommand(
+                "SELECT TOP 5 Services, COUNT(*) AS Cnt FROM [Appointments] " +
+                "GROUP BY Services ORDER BY Cnt DESC", conn))
+            using (var rdr = cmd.ExecuteReader())
+            {
+                while (rdr.Read())
+                    sb.AppendLine(rdr["Services"] + ": " + rdr["Cnt"] + " bookings");
+            }
+        }
+        catch { sb.AppendLine("(data unavailable)"); }
+
+        return sb.Length > 0 ? sb.ToString() : "No appointment data available yet.";
+    }
+
+    // -----------------------------------------------------------------------
     // GridView: Appointments (triage + no-show colour coding)
     // -----------------------------------------------------------------------
 
