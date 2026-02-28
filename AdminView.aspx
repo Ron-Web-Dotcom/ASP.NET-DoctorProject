@@ -394,6 +394,58 @@
       </div>
     </div>
 
+    <!-- ===== Patient Feedback Grid + AI Summary ===== -->
+    <h3 style="margin-top:30px;">
+        Patient Feedback
+        <small style="color:#777;">Post-Appointment Ratings &amp; Sentiment</small>
+    </h3>
+    <p style="color:#555;">
+        Ratings and sentiment badges are generated automatically by GPT-4 when patients submit feedback.
+    </p>
+    <asp:GridView ID="GridViewFeedback" runat="server"
+        AllowPaging="True" AllowSorting="True"
+        AutoGenerateColumns="False"
+        DataSourceID="SqlDataSourceFeedback"
+        OnRowDataBound="GridViewFeedback_RowDataBound"
+        CssClass="table table-bordered table-hover" Width="100%">
+        <Columns>
+            <asp:BoundField DataField="Id"          HeaderText="ID"       InsertVisible="False" ReadOnly="True" SortExpression="Id" />
+            <asp:BoundField DataField="PatientName" HeaderText="Patient"  SortExpression="PatientName" />
+            <asp:BoundField DataField="Service"     HeaderText="Service"  SortExpression="Service" />
+            <asp:BoundField DataField="Rating"      HeaderText="Rating"   SortExpression="Rating" ItemStyle-Font-Bold="True" />
+            <asp:BoundField DataField="Comment"     HeaderText="Comment"  SortExpression="Comment" />
+            <asp:BoundField DataField="Sentiment"   HeaderText="Sentiment" SortExpression="Sentiment" ItemStyle-Font-Bold="True" />
+            <asp:BoundField DataField="SubmittedAt" HeaderText="Submitted" SortExpression="SubmittedAt" DataFormatString="{0:dd MMM yyyy}" />
+        </Columns>
+    </asp:GridView>
+    <asp:SqlDataSource ID="SqlDataSourceFeedback" runat="server"
+        ConnectionString="<%$ ConnectionStrings:SignUpDBConnectionString1 %>"
+        SelectCommand="SELECT Id, PatientName, Service, Rating, Comment, Sentiment, SubmittedAt FROM [Feedback] ORDER BY SubmittedAt DESC">
+    </asp:SqlDataSource>
+
+    <!-- AI Feedback Summary panel -->
+    <div class="panel panel-warning" style="margin-top:20px;">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <span class="glyphicon glyphicon-stats"></span>
+          AI Feedback Summary
+          <asp:Button ID="BtnFeedbackSummary" runat="server" Text="Generate Summary"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnFeedbackSummary_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          GPT-4 analyses all patient feedback and produces an executive summary of satisfaction trends,
+          recurring themes, and recommended actions for management.
+        </p>
+        <asp:Panel ID="PanelFeedbackSummary" runat="server" Visible="false">
+          <div class="alert alert-warning" style="white-space:pre-wrap;">
+            <asp:Literal ID="LitFeedbackSummary" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
     <!-- Quick link to Staff Bio Generator -->
     <div class="alert alert-info" style="margin-bottom:40px;">
       <span class="glyphicon glyphicon-user"></span>

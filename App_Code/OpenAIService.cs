@@ -947,6 +947,119 @@ public static class OpenAIService
     /// <param name="month">The month and year (e.g. "February 2026").</param>
     /// <param name="topServicesData">Plain-text summary of top booked services with counts.</param>
     /// <returns>A complete newsletter as plain text.</returns>
+    // -----------------------------------------------------------------------
+    // 26. AI Diet & Lifestyle Planner (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a personalised diet, exercise, and lifestyle plan for a patient
+    /// based on their upcoming specialty and optional health details.
+    /// </summary>
+    public static string GetLifestylePlan(string specialty, string age, string conditions)
+    {
+        string prompt =
+            "You are a friendly health advisor at Portmore Medical Center.\n\n" +
+            "A patient is booked for: " + specialty + "\n" +
+            "Age: " + (string.IsNullOrWhiteSpace(age) ? "not specified" : age) + "\n" +
+            "Other conditions or notes: " + (string.IsNullOrWhiteSpace(conditions) ? "none" : conditions) + "\n\n" +
+            "Write a personalised wellness plan with three clearly labelled sections:\n" +
+            "1. DIET RECOMMENDATIONS (4-5 practical tips specific to this specialty)\n" +
+            "2. EXERCISE & ACTIVITY (3-4 appropriate suggestions)\n" +
+            "3. LIFESTYLE TIPS (3-4 general wellbeing tips for this condition)\n\n" +
+            "Keep it friendly, motivating, and under 300 words. Plain text only, no HTML. " +
+            "End with a brief reminder to follow their doctor's advice above all.";
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 500)
+               ?? "1. DIET RECOMMENDATIONS\nFocus on a balanced diet rich in vegetables, lean protein, and whole grains. " +
+                  "Limit salt, sugar, and processed foods. Stay well hydrated.\n\n" +
+                  "2. EXERCISE & ACTIVITY\nAim for 30 minutes of moderate activity most days. " +
+                  "Consult your doctor before starting any new exercise routine.\n\n" +
+                  "3. LIFESTYLE TIPS\nPrioritise sleep, manage stress, avoid smoking, and limit alcohol. " +
+                  "Always follow your doctor's personalised advice.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 27. AI Insurance & Cost Estimator (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Provides a plain-English overview of what is typically covered for a service,
+    /// questions to ask the insurer, and general cost guidance.
+    /// </summary>
+    public static string GetInsuranceGuide(string service, string insuranceType)
+    {
+        string prompt =
+            "You are a helpful patient services advisor at Portmore Medical Center.\n\n" +
+            "A patient is asking about insurance and costs for: " + service + "\n" +
+            "Their insurance type: " + (string.IsNullOrWhiteSpace(insuranceType) ? "not specified" : insuranceType) + "\n\n" +
+            "Provide a structured plain-text response with three sections:\n" +
+            "1. WHAT IS TYPICALLY COVERED (general guidance for this specialty — 3-4 bullet points)\n" +
+            "2. QUESTIONS TO ASK YOUR INSURER (5 practical questions the patient should ask)\n" +
+            "3. COST GUIDANCE (general ranges and factors that affect cost — keep vague/general, no specific figures)\n\n" +
+            "Always include this disclaimer at the end: " +
+            "'This is general guidance only. Contact your insurance provider and our billing team for exact details.' " +
+            "Plain text only. Under 280 words.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 450)
+               ?? "1. WHAT IS TYPICALLY COVERED\nCoverage varies by provider and plan. " +
+                  "Consultations, diagnostics, and treatments may each be covered differently.\n\n" +
+                  "2. QUESTIONS TO ASK YOUR INSURER\n- Is this specialist covered under my plan?\n" +
+                  "- What is my excess/co-pay for this service?\n- Do I need a referral?\n" +
+                  "- Are diagnostic tests covered separately?\n- What is my annual benefit limit?\n\n" +
+                  "3. COST GUIDANCE\nCosts depend on your plan, the complexity of your visit, and any tests required.\n\n" +
+                  "This is general guidance only. Contact your insurance provider and our billing team for exact details.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 28. Doctor Focus Summary (Doctor Availability Viewer)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a short patient-friendly summary of a doctor's focus areas
+    /// within their specialty, based on their name and specialty alone.
+    /// </summary>
+    public static string GetDoctorFocusSummary(string doctorName, string specialty)
+    {
+        string prompt =
+            "Write a short 2-sentence patient-friendly description of what Dr. " + doctorName +
+            " specialises in within " + specialty + " at Portmore Medical Center. " +
+            "Make it warm, reassuring, and specific to the specialty. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.6, maxTokens: 100)
+               ?? "Dr. " + doctorName + " is a specialist in " + specialty +
+                  " at Portmore Medical Center, bringing expert care and a patient-centred approach to every consultation.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 29. Feedback Summary (Admin — Post-Appointment Feedback)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Analyses a batch of patient feedback submissions and produces an
+    /// executive-style summary for the admin dashboard.
+    /// </summary>
+    public static string GetFeedbackSummary(string feedbackData)
+    {
+        string prompt =
+            "You are an operations analyst for Portmore Medical Center.\n\n" +
+            "Below is a summary of recent patient feedback submissions:\n\n" +
+            feedbackData + "\n\n" +
+            "Write a concise 4-6 sentence executive summary covering:\n" +
+            "- Overall patient satisfaction trend\n" +
+            "- Any recurring positive themes\n" +
+            "- Any recurring concerns or areas for improvement\n" +
+            "- A recommended action for management\n\n" +
+            "Professional tone. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 300)
+               ?? "Insufficient feedback data to generate a summary at this time. " +
+                  "Please collect more patient responses before generating an analysis.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 24. Monthly Health Newsletter Generator (new Feature 10 admin)
+    // -----------------------------------------------------------------------
+
     public static string GetMonthlyNewsletter(string month, string topServicesData)
     {
         string prompt =

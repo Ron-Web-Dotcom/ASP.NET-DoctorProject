@@ -284,6 +284,105 @@ public partial class AdminView : System.Web.UI.Page
     }
 
     // -----------------------------------------------------------------------
+    // Patient Feedback: AI Summary + GridView colour coding
+    // -----------------------------------------------------------------------
+
+    protected void BtnFeedbackSummary_Click(object sender, EventArgs e)
+    {
+        string feedbackData = BuildFeedbackSummaryData();
+        string summary      = OpenAIService.GetFeedbackSummary(feedbackData);
+        LitFeedbackSummary.Text      = System.Web.HttpUtility.HtmlEncode(summary);
+        PanelFeedbackSummary.Visible = true;
+    }
+
+    private string BuildFeedbackSummaryData()
+    {
+        var sb = new StringBuilder();
+        try
+        {
+            using (SqlConnection conn = connectionManager.GetMembersConnection())
+            {
+                using (var cmd = new SqlCommand("SELECT COUNT(*) FROM [Feedback]", conn))
+                    sb.AppendLine("Total feedback submissions: " + cmd.ExecuteScalar());
+
+                using (var cmd = new SqlCommand(
+                    "SELECT AVG(CAST(Rating AS FLOAT)) FROM [Feedback]", conn))
+                {
+                    object avg = cmd.ExecuteScalar();
+                    sb.AppendLine("Average rating: " +
+                        (avg != DBNull.Value ? ((double)avg).ToString("0.0") : "N/A") + " / 5");
+                }
+
+                sb.AppendLine("\nFeedback by sentiment:");
+                using (var cmd = new SqlCommand(
+                    "SELECT Sentiment, COUNT(*) AS Cnt FROM [Feedback] " +
+                    "WHERE Sentiment IS NOT NULL GROUP BY Sentiment ORDER BY Cnt DESC", conn))
+                using (var rdr = cmd.ExecuteReader())
+                    while (rdr.Read())
+                        sb.AppendLine("  " + rdr["Sentiment"] + ": " + rdr["Cnt"]);
+
+                sb.AppendLine("\nRecent comments (last 10):");
+                using (var cmd = new SqlCommand(
+                    "SELECT TOP 10 PatientName, Service, Rating, Comment " +
+                    "FROM [Feedback] ORDER BY SubmittedAt DESC", conn))
+                using (var rdr = cmd.ExecuteReader())
+                    while (rdr.Read())
+                        sb.AppendLine("  [" + rdr["Rating"] + "* " + rdr["Service"] + "] " + rdr["Comment"]);
+            }
+        }
+        catch (Exception ex)
+        {
+            sb.AppendLine("(Could not load feedback data: " + ex.Message + ")");
+        }
+        return sb.Length > 0 ? sb.ToString() : "No feedback data available yet.";
+    }
+
+    protected void GridViewFeedback_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType != DataControlRowType.DataRow) return;
+
+        // Rating column (index 3) — colour by score
+        int rating;
+        if (int.TryParse(e.Row.Cells[3].Text, out rating))
+        {
+            if (rating >= 4)
+            {
+                e.Row.Cells[3].BackColor = System.Drawing.Color.FromArgb(0xDF, 0xF0, 0xD8);
+                e.Row.Cells[3].ForeColor = System.Drawing.Color.FromArgb(0x3C, 0x76, 0x3D);
+            }
+            else if (rating == 3)
+            {
+                e.Row.Cells[3].BackColor = System.Drawing.Color.FromArgb(0xFC, 0xF8, 0xE3);
+                e.Row.Cells[3].ForeColor = System.Drawing.Color.FromArgb(0x8A, 0x6D, 0x3B);
+            }
+            else
+            {
+                e.Row.Cells[3].BackColor = System.Drawing.Color.FromArgb(0xF2, 0xDE, 0xDE);
+                e.Row.Cells[3].ForeColor = System.Drawing.Color.FromArgb(0xA9, 0x44, 0x42);
+            }
+            e.Row.Cells[3].Text = rating + " \u2605";
+        }
+
+        // Sentiment column (index 5)
+        string sentiment = e.Row.Cells[5].Text;
+        switch (sentiment)
+        {
+            case "Urgent":
+                e.Row.Cells[5].BackColor = System.Drawing.Color.FromArgb(0xF2, 0xDE, 0xDE);
+                e.Row.Cells[5].ForeColor = System.Drawing.Color.FromArgb(0xA9, 0x44, 0x42);
+                break;
+            case "Distressed":
+                e.Row.Cells[5].BackColor = System.Drawing.Color.FromArgb(0xFF, 0xE0, 0xB2);
+                e.Row.Cells[5].ForeColor = System.Drawing.Color.FromArgb(0xE6, 0x51, 0x00);
+                break;
+            case "Positive":
+                e.Row.Cells[5].BackColor = System.Drawing.Color.FromArgb(0xDF, 0xF0, 0xD8);
+                e.Row.Cells[5].ForeColor = System.Drawing.Color.FromArgb(0x3C, 0x76, 0x3D);
+                break;
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // GridView: Appointments (triage + no-show colour coding)
     // -----------------------------------------------------------------------
 

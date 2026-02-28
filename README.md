@@ -78,6 +78,7 @@ Run the following migration scripts **once** against `SignUpDB.mdf` using SQL Se
 |--------|---------|
 | `App_Data/AITriageSchema.sql` | Adds `AITriage` and `AINote` columns to `Appointments` |
 | `App_Data/AIFeaturesSchema.sql` | Adds `NoShowRisk` to `Appointments`; adds `Sentiment` and `SentimentReason` to `Contacts` |
+| `App_Data/FeedbackSchema.sql` | Creates the `Feedback` table for post-appointment ratings |
 
 ### Expected Tables
 
@@ -259,6 +260,53 @@ After signing in, patients land on their personal dashboard instead of being red
 
 **Session change:** `SignIn2.aspx.cs` now also stores `Session["Email"]` on login, and redirects to `MyAppointments.aspx` instead of `ContactForm.aspx`.
 
+### 22. AI Diet & Lifestyle Planner
+**Page:** `LifestylePlanner.aspx`
+**Method:** `OpenAIService.GetLifestylePlan()`
+
+Patient selects their upcoming specialty and optionally provides their age and other conditions. GPT-4 generates a personalised plan with three clearly labelled sections: **Diet Recommendations**, **Exercise & Activity**, and **Lifestyle Tips** — all tailored to the selected specialty. Ends with a reminder to follow the doctor's advice. Accessible from the AI Tools navbar dropdown.
+
+---
+
+### 23. AI Insurance & Cost Estimator
+**Page:** `InsuranceEstimator.aspx`
+**Method:** `OpenAIService.GetInsuranceGuide()`
+
+Patient picks a service and their insurance type. GPT-4 returns a structured guide covering: what is typically covered for that specialty, five practical questions to ask the insurer, and general cost factors. Always closes with a mandatory disclaimer to contact the insurance provider and the clinic's billing team. Accessible from the AI Tools navbar dropdown.
+
+---
+
+### 24. Doctor Availability Viewer
+**Page:** `DoctorAvailability.aspx`
+**Method:** `OpenAIService.GetDoctorFocusSummary()`
+
+Patient selects a specialty from a dropdown. The page looks up the relevant doctors from a static roster (7 specialties, 10 named doctors with typical time slots) and calls GPT-4 once per doctor to generate a short, patient-friendly 2-sentence summary of that doctor's focus areas. Results are shown as individual doctor cards with available time slot badges and a "Book with this Doctor" button. Accessible from the AI Tools navbar dropdown.
+
+**Doctor roster:**
+
+| Specialty | Doctors |
+|-----------|---------|
+| Cardiology | Dr. Michael Knapton, Dr. Patrick H Maxwell |
+| General Practitioner | Dr. Mike More, Dr. Shirley Pointer |
+| Gynaecology | Dr. Ann-Marie Ingle, Dr. Evelyn Barker |
+| Opticology | Dr. Roland Siker |
+| Paediatrics | Dr. Sharon Peacock |
+| Radiology | Dr. Kate Lancaster |
+| Surgery | Dr. Jag Ahluwalia |
+
+---
+
+### 25. Post-Appointment Feedback
+**Page:** `AppointmentFeedback.aspx`
+**Method:** `OpenAIService.GetSentiment()` (reuses existing method)
+**DB migration:** `App_Data/FeedbackSchema.sql`
+
+Patients submit a star rating (1–5) and a free-text comment after their visit. GPT-4 analyses the comment using the existing sentiment classifier (Positive / Neutral / Distressed / Urgent) and the sentiment badge is shown instantly on the thank-you screen. All submissions — name, email, service, rating, comment, sentiment — are persisted to the new `Feedback` table. Accessible from the AI Tools navbar dropdown.
+
+**Admin view** (`AdminView.aspx`):
+- New `GridViewFeedback` shows all submissions with colour-coded rating (green/amber/red) and sentiment badges.
+- **Generate Summary** button calls `OpenAIService.GetFeedbackSummary()` — GPT-4 analyses total submissions, average rating, sentiment breakdown, and last 10 comments to produce an executive-style summary for management.
+
 ---
 
 ## AI Features — Admin-Facing
@@ -392,6 +440,10 @@ Admin enters a doctor's name, specialty, qualifications, years of experience, an
 | `AIChatAssistant.aspx` | Public | Real-time GPT-4 chat assistant |
 | `ContactForm.aspx` | Public | Contact form with AI sentiment analysis |
 | `MyAppointments.aspx` | Patient | Personal dashboard — all bookings, AI triage badges, per-appointment prep tips |
+| `LifestylePlanner.aspx` | Public | AI diet, exercise & lifestyle plan by specialty |
+| `InsuranceEstimator.aspx` | Public | AI insurance coverage guide & cost estimator |
+| `DoctorAvailability.aspx` | Public | Doctor roster by specialty with AI focus summaries |
+| `AppointmentFeedback.aspx` | Public | Post-appointment star rating with AI sentiment analysis |
 | `SignUp.aspx` | Public | Patient registration |
 | `SignIn2.aspx` | Public | Patient login |
 | `AdminView.aspx` | Admin | Full dashboard: all grids + all admin AI panels |
@@ -444,6 +496,10 @@ All AI calls are centralised in `App_Code/OpenAIService.cs`. Every public method
 | `GetStaffBio()` | Staff biography generator | `string` |
 | `GetMonthlyNewsletter()` | Monthly patient newsletter | `string` |
 | `GetAppointmentPreparationTip()` | Per-appointment prep tip on patient dashboard | `string` |
+| `GetLifestylePlan()` | Personalised diet, exercise & lifestyle plan | `string` |
+| `GetInsuranceGuide()` | Insurance coverage guide & questions to ask | `string` |
+| `GetDoctorFocusSummary()` | 2-sentence focus summary per doctor | `string` |
+| `GetFeedbackSummary()` | Executive summary of all patient feedback | `string` |
 
 ---
 

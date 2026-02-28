@@ -115,6 +115,11 @@
                                 <li><a href="SymptomDiary.aspx"><span class="glyphicon glyphicon-pencil"></span> Symptom Diary</a></li>
                                 <li class="divider"></li>
                                 <li><a href="CancelAppointment.aspx"><span class="glyphicon glyphicon-remove-circle"></span> Cancel / Reschedule</a></li>
+                                <li class="divider"></li>
+                                <li><a href="LifestylePlanner.aspx"><span class="glyphicon glyphicon-leaf"></span> Diet &amp; Lifestyle Planner</a></li>
+                                <li><a href="InsuranceEstimator.aspx"><span class="glyphicon glyphicon-usd"></span> Insurance &amp; Cost Guide</a></li>
+                                <li><a href="DoctorAvailability.aspx"><span class="glyphicon glyphicon-user"></span> Doctor Availability</a></li>
+                                <li><a href="AppointmentFeedback.aspx"><span class="glyphicon glyphicon-star"></span> Leave Feedback</a></li>
                             </ul>
                         </li>
                         <!-- Feature 4: Language toggle — translates current page content via TranslateHandler.ashx -->
