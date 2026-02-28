@@ -910,6 +910,33 @@ public static class OpenAIService
     }
 
     // -----------------------------------------------------------------------
+    // 25. Appointment Preparation Tip (Patient Dashboard)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a short, personalised preparation reminder for a patient
+    /// viewing a specific upcoming appointment on their dashboard.
+    /// </summary>
+    /// <param name="service">The booked specialty (e.g. "Cardiology").</param>
+    /// <param name="timeSlot">The booked time slot (e.g. "9:00 AM – 10:00 AM").</param>
+    /// <returns>2–3 sentences of plain-text preparation advice.</returns>
+    public static string GetAppointmentPreparationTip(string service, string timeSlot)
+    {
+        string prompt =
+            "A patient at Portmore Medical Center has an upcoming appointment.\n\n" +
+            "Service: " + service + "\n" +
+            "Time slot: " + timeSlot + "\n\n" +
+            "Write 2-3 short, friendly sentences of practical preparation advice specific to this " +
+            "specialty and time of day (e.g. fasting, wearing comfortable clothing, arriving early, " +
+            "bringing documents). Plain text only, no bullet points, no headers.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 120)
+               ?? "Please arrive 10 minutes early for your " + service + " appointment. " +
+                  "Bring a photo ID, any referral letters, and a list of your current medications. " +
+                  "If you have any concerns before your visit, do not hesitate to call reception.";
+    }
+
+    // -----------------------------------------------------------------------
     // 24. Monthly Health Newsletter Generator (new Feature 10 admin)
     // -----------------------------------------------------------------------
 

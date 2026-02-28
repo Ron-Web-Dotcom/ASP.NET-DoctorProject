@@ -244,6 +244,21 @@ After booking, GPT-4 writes a short plain-English overview of the patient's book
 
 Before inserting a new appointment, the system queries the `Appointments` table for an existing record with the same first name, last name, and service. If a match is found, a yellow warning banner is shown. The booking is not blocked — the patient can still submit if intentional.
 
+### 21. Patient Appointment Dashboard
+**Page:** `MyAppointments.aspx`
+**Method:** `OpenAIService.GetAppointmentPreparationTip()`
+
+After signing in, patients land on their personal dashboard instead of being redirected to the contact form. The dashboard:
+
+- Queries the `Appointments` table by email and lists **all the patient's bookings** in a styled table.
+- Each row shows the **service**, **time slot**, **AI triage badge** (colour-coded: Urgent / High / Medium / Low), the **AI pre-assessment note** written by GPT-4 at booking time, and the **no-show risk badge**.
+- A **Get AI Tip** button on each row calls GPT-4 and returns 2–3 sentences of personalised preparation advice specific to that specialty and time of day — shown in a blue callout below the table.
+- If the patient has no bookings, an empty-state panel with a "Book Your First Appointment" button is shown instead.
+- The page is **session-guarded**: unauthenticated visitors are redirected to the Sign In page.
+- Quick-link cards at the bottom lead to Cancel / Reschedule, AI Chat Assistant, and the Contact Form.
+
+**Session change:** `SignIn2.aspx.cs` now also stores `Session["Email"]` on login, and redirects to `MyAppointments.aspx` instead of `ContactForm.aspx`.
+
 ---
 
 ## AI Features — Admin-Facing
@@ -376,6 +391,7 @@ Admin enters a doctor's name, specialty, qualifications, years of experience, an
 | `SymptomChecker.aspx` | Public | AI symptom-to-specialist recommender |
 | `AIChatAssistant.aspx` | Public | Real-time GPT-4 chat assistant |
 | `ContactForm.aspx` | Public | Contact form with AI sentiment analysis |
+| `MyAppointments.aspx` | Patient | Personal dashboard — all bookings, AI triage badges, per-appointment prep tips |
 | `SignUp.aspx` | Public | Patient registration |
 | `SignIn2.aspx` | Public | Patient login |
 | `AdminView.aspx` | Admin | Full dashboard: all grids + all admin AI panels |
@@ -427,6 +443,7 @@ All AI calls are centralised in `App_Code/OpenAIService.cs`. Every public method
 | `GetComplaintResponse()` | Complaint escalation response | `string` |
 | `GetStaffBio()` | Staff biography generator | `string` |
 | `GetMonthlyNewsletter()` | Monthly patient newsletter | `string` |
+| `GetAppointmentPreparationTip()` | Per-appointment prep tip on patient dashboard | `string` |
 
 ---
 

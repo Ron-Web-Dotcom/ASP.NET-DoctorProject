@@ -131,6 +131,7 @@
                                 <li><a href="#" class="lang-option" data-lang="Portuguese">Portuguese</a></li>
                             </ul>
                         </li>
+                        <li><a href="MyAppointments.aspx"><span class="glyphicon glyphicon-calendar"></span> My Appointments</a></li>
                         <asp:LinkButton ID="LinkButton1" runat="server"><a href="SignIn2.aspx">Sign In</a></asp:LinkButton>
 
                         <asp:LinkButton ID="LinkButton2" runat="server"><a href="SignUp.aspx">Sign Up</a></asp:LinkButton>

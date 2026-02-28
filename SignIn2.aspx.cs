@@ -97,8 +97,9 @@ public partial class SignIn2 : System.Web.UI.Page
                     // Store user identity in session for use on subsequent pages
                     Session["FirstName"] = read["FirstName"].ToString();
                     Session["LastName"]  = read["LastName"].ToString();
+                    Session["Email"]     = Email;
 
-                    Response.Redirect("ContactForm.aspx");
+                    Response.Redirect("MyAppointments.aspx");
                 }
                 else
                 {
