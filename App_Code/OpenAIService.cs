@@ -1080,4 +1080,301 @@ public static class OpenAIService
                   "to secure your preferred time slot.\n\n" +
                   "The Portmore Medical Center Team";
     }
+
+    // -----------------------------------------------------------------------
+    // 30. Emergency Symptom Triage (Patient)
+    // -----------------------------------------------------------------------
+
+    public static string GetEmergencyTriage(string symptoms)
+    {
+        string prompt =
+            "You are an emergency triage assistant at Portmore Medical Center. " +
+            "A patient has described the following symptoms:\n\n" + symptoms + "\n\n" +
+            "Classify their situation into EXACTLY ONE of these four levels and explain why:\n" +
+            "EMERGENCY — Call 999 or go to A&E immediately. Life-threatening signs present.\n" +
+            "URGENT — Visit A&E or urgent care today. Serious but not immediately life-threatening.\n" +
+            "APPOINTMENT — Book a GP or specialist appointment within the next few days.\n" +
+            "SELF-CARE — Manageable at home. Provide 3-4 clear self-care steps.\n\n" +
+            "Format your response:\n" +
+            "Level: [EMERGENCY/URGENT/APPOINTMENT/SELF-CARE]\n" +
+            "Reason: [2-3 sentences explaining the classification]\n" +
+            "Action: [Clear next steps for the patient]\n\n" +
+            "IMPORTANT: Always end with: 'If symptoms worsen, seek immediate medical attention.' " +
+            "Plain text only. Do not diagnose.";
+
+        return CallGpt(prompt, temp: 0.1, maxTokens: 300)
+               ?? "Level: APPOINTMENT\nReason: Unable to assess symptoms automatically at this time.\n" +
+                  "Action: Please book an appointment with your GP as soon as possible to discuss your symptoms.\n\n" +
+                  "If symptoms worsen, seek immediate medical attention.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 31. Medical History Summariser (Patient)
+    // -----------------------------------------------------------------------
+
+    public static string GetMedicalHistorySummary(string conditions, string medications,
+        string allergies, string surgeries, string familyHistory)
+    {
+        string prompt =
+            "You are a clinical documentation assistant at Portmore Medical Center. " +
+            "A patient has provided their medical history. Generate a concise, well-structured " +
+            "clinical summary suitable for sharing with any healthcare provider.\n\n" +
+            "Current conditions: " + (string.IsNullOrWhiteSpace(conditions) ? "None reported" : conditions) + "\n" +
+            "Current medications: " + (string.IsNullOrWhiteSpace(medications) ? "None reported" : medications) + "\n" +
+            "Known allergies: " + (string.IsNullOrWhiteSpace(allergies) ? "None reported" : allergies) + "\n" +
+            "Past surgeries/procedures: " + (string.IsNullOrWhiteSpace(surgeries) ? "None reported" : surgeries) + "\n" +
+            "Family history: " + (string.IsNullOrWhiteSpace(familyHistory) ? "None reported" : familyHistory) + "\n\n" +
+            "Write a structured clinical summary with clear sections. " +
+            "Professional tone. Plain text only. Under 250 words.";
+
+        return CallGpt(prompt, temp: 0.2, maxTokens: 400)
+               ?? "MEDICAL HISTORY SUMMARY\n\n" +
+                  "Current Conditions: " + (string.IsNullOrWhiteSpace(conditions) ? "None reported" : conditions) + "\n" +
+                  "Medications: " + (string.IsNullOrWhiteSpace(medications) ? "None reported" : medications) + "\n" +
+                  "Allergies: " + (string.IsNullOrWhiteSpace(allergies) ? "None reported" : allergies) + "\n" +
+                  "Surgical History: " + (string.IsNullOrWhiteSpace(surgeries) ? "None reported" : surgeries) + "\n" +
+                  "Family History: " + (string.IsNullOrWhiteSpace(familyHistory) ? "None reported" : familyHistory);
+    }
+
+    // -----------------------------------------------------------------------
+    // 32. Mental Health Check-In (Patient)
+    // -----------------------------------------------------------------------
+
+    public static string GetMentalHealthCheckIn(string moodScore, string sleepScore,
+        string anxietyScore, string energyScore, string socialScore, string extraNotes)
+    {
+        string prompt =
+            "You are a compassionate mental health support advisor at Portmore Medical Center.\n\n" +
+            "A patient has completed a wellbeing check-in (scores are 1=very poor to 5=excellent):\n" +
+            "Mood: " + moodScore + "/5\n" +
+            "Sleep quality: " + sleepScore + "/5\n" +
+            "Anxiety level (1=very anxious, 5=calm): " + anxietyScore + "/5\n" +
+            "Energy levels: " + energyScore + "/5\n" +
+            "Social connection: " + socialScore + "/5\n" +
+            "Additional notes: " + (string.IsNullOrWhiteSpace(extraNotes) ? "None" : extraNotes) + "\n\n" +
+            "Provide a warm, non-clinical response with:\n" +
+            "1. WELLBEING SUMMARY: A brief, empathetic summary of their current state (2-3 sentences)\n" +
+            "2. SUGGESTED SUPPORT: 3-4 practical, evidence-based suggestions tailored to their scores\n" +
+            "3. WHEN TO SEEK HELP: Clear guidance on when to speak to a GP or counsellor\n\n" +
+            "Warm, supportive tone. Never diagnose. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 350)
+               ?? "1. WELLBEING SUMMARY\nThank you for taking the time to check in on your wellbeing. " +
+                  "Your responses have been noted.\n\n" +
+                  "2. SUGGESTED SUPPORT\nPrioritise regular sleep, gentle exercise, and social connection. " +
+                  "Consider mindfulness or breathing exercises for stress management.\n\n" +
+                  "3. WHEN TO SEEK HELP\nIf you are feeling overwhelmed, persistently low, or anxious for " +
+                  "more than two weeks, please speak to your GP.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 33. Health Goal Planner (Patient)
+    // -----------------------------------------------------------------------
+
+    public static string GetHealthGoalPlan(string goal, string activityLevel, string conditions)
+    {
+        string prompt =
+            "You are a health coach at Portmore Medical Center.\n\n" +
+            "Patient's health goal: " + goal + "\n" +
+            "Current activity level: " + (string.IsNullOrWhiteSpace(activityLevel) ? "not specified" : activityLevel) + "\n" +
+            "Existing conditions: " + (string.IsNullOrWhiteSpace(conditions) ? "none" : conditions) + "\n\n" +
+            "Create a realistic 4-week action plan with these sections:\n" +
+            "WEEK 1: [Foundation — easy starting habits]\n" +
+            "WEEK 2: [Building — slightly increase intensity/consistency]\n" +
+            "WEEK 3: [Progress — add a new habit or milestone]\n" +
+            "WEEK 4: [Consolidate — review and plan for the future]\n" +
+            "TIPS FOR SUCCESS: [3 motivational, practical tips]\n\n" +
+            "Keep each week to 2-3 bullet points. Friendly, encouraging tone. " +
+            "End with: 'Always consult your doctor before making significant changes to your health routine.' " +
+            "Plain text only. Under 320 words.";
+
+        return CallGpt(prompt, temp: 0.6, maxTokens: 500)
+               ?? "WEEK 1: Start with 15-minute daily walks. Track your food intake. Sleep 7-8 hours.\n" +
+                  "WEEK 2: Increase walks to 30 minutes. Add one portion of vegetables per meal.\n" +
+                  "WEEK 3: Try a new form of exercise. Set a weekly check-in with yourself.\n" +
+                  "WEEK 4: Review your progress. Plan how to maintain your new habits long-term.\n\n" +
+                  "TIPS FOR SUCCESS: Set reminders. Find an accountability partner. Celebrate small wins.\n\n" +
+                  "Always consult your doctor before making significant changes to your health routine.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 34. Second Opinion Question Generator (Patient)
+    // -----------------------------------------------------------------------
+
+    public static string GetSecondOpinionQuestions(string diagnosisText)
+    {
+        string prompt =
+            "You are a patient advocate at Portmore Medical Center. " +
+            "A patient has received the following diagnosis or treatment plan and wants to " +
+            "be well-prepared for their next appointment or a second opinion:\n\n" +
+            diagnosisText + "\n\n" +
+            "Generate 8-10 intelligent, specific questions the patient should ask their doctor. " +
+            "Group them into:\n" +
+            "UNDERSTANDING THE DIAGNOSIS: (3-4 questions)\n" +
+            "TREATMENT OPTIONS: (3-4 questions)\n" +
+            "NEXT STEPS & LIFESTYLE: (2-3 questions)\n\n" +
+            "Questions should be direct and patient-friendly. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 400)
+               ?? "UNDERSTANDING THE DIAGNOSIS:\n" +
+                  "- What exactly is my diagnosis and what does it mean for my health?\n" +
+                  "- How confident are you in this diagnosis?\n" +
+                  "- What caused this condition?\n\n" +
+                  "TREATMENT OPTIONS:\n" +
+                  "- What are all the treatment options available to me?\n" +
+                  "- What are the risks and benefits of each option?\n" +
+                  "- What happens if I choose not to treat it?\n\n" +
+                  "NEXT STEPS & LIFESTYLE:\n" +
+                  "- What lifestyle changes should I make?\n" +
+                  "- When should I follow up with you?";
+    }
+
+    // -----------------------------------------------------------------------
+    // 35. Recovery Tracker Analyser (Patient)
+    // -----------------------------------------------------------------------
+
+    public static string AnalyseRecovery(string recoveryEntries, string procedure)
+    {
+        string prompt =
+            "You are a recovery support advisor at Portmore Medical Center.\n\n" +
+            "A patient recovering from " + procedure + " has logged the following daily recovery notes:\n\n" +
+            recoveryEntries + "\n\n" +
+            "Provide a structured recovery analysis:\n" +
+            "RECOVERY TREND: (2-3 sentences on whether recovery appears on track, improving, or concerning)\n" +
+            "POSITIVE SIGNS: (any encouraging indicators)\n" +
+            "AREAS TO WATCH: (anything that may need attention)\n" +
+            "RECOMMENDATION: One of: 'Recovery appears on track', 'Consider contacting your care team', " +
+            "or 'Please contact your doctor promptly'\n\n" +
+            "Supportive, non-alarming tone unless genuinely concerning. Plain text only. No diagnosis.";
+
+        return CallGpt(prompt, temp: 0.3, maxTokens: 300)
+               ?? "RECOVERY TREND: Unable to analyse entries at this time.\n\n" +
+                  "RECOMMENDATION: If you have any concerns about your recovery, " +
+                  "please contact your care team or call the clinic directly.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 36. Staff Performance Report (Admin)
+    // -----------------------------------------------------------------------
+
+    public static string GetStaffPerformanceReport(string appointmentData, string feedbackData)
+    {
+        string prompt =
+            "You are an operations analyst for Portmore Medical Center.\n\n" +
+            "APPOINTMENT DATA:\n" + appointmentData + "\n\n" +
+            "PATIENT FEEDBACK DATA:\n" + feedbackData + "\n\n" +
+            "Write a professional staff performance report covering:\n" +
+            "1. BUSIEST DEPARTMENTS: Which services have the highest demand\n" +
+            "2. PATIENT SATISFACTION: Overall trends from feedback ratings and sentiment\n" +
+            "3. OPERATIONAL CONCERNS: Any triage escalations, high no-show rates, or distressed feedback\n" +
+            "4. RECOMMENDATIONS: 3 specific, actionable recommendations for management\n\n" +
+            "Professional report tone. Under 300 words. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.3, maxTokens: 500)
+               ?? "Insufficient data to generate a staff performance report at this time. " +
+                  "Please ensure appointment and feedback records are available.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 37. Social Media Post Generator (Admin)
+    // -----------------------------------------------------------------------
+
+    public static string GetSocialMediaPost(string topic, string platform)
+    {
+        string prompt =
+            "You are the social media manager for Portmore Medical Center.\n\n" +
+            "Write a " + platform + " post about: " + topic + "\n\n" +
+            "The post should:\n" +
+            "- Be appropriate for " + platform + " (length, tone, hashtag usage)\n" +
+            "- Promote health awareness in a friendly, accessible way\n" +
+            "- Include a call-to-action (e.g. 'Book an appointment at Portmore Medical Center')\n" +
+            "- Include 3-5 relevant hashtags at the end\n" +
+            "- Sound warm and professional, not clinical\n\n" +
+            "Plain text only. Write the post directly without any preamble.";
+
+        return CallGpt(prompt, temp: 0.7, maxTokens: 200)
+               ?? "At Portmore Medical Center, we care about your health every day. " +
+                  "Book your appointment today and let our expert team support your wellbeing journey. " +
+                  "#PortmoreMedical #HealthFirst #BookNow #PatientCare #Wellness";
+    }
+
+    // -----------------------------------------------------------------------
+    // 38. Clinical Audit Report (Admin)
+    // -----------------------------------------------------------------------
+
+    public static string GetClinicalAuditReport(string auditData)
+    {
+        string prompt =
+            "You are a clinical governance analyst for Portmore Medical Center.\n\n" +
+            "The following data has been compiled for a clinical audit:\n\n" +
+            auditData + "\n\n" +
+            "Write a formal clinical audit report with these sections:\n" +
+            "EXECUTIVE SUMMARY: (3-4 sentences overview)\n" +
+            "KEY FINDINGS: (4-6 bullet points of notable findings)\n" +
+            "AREAS OF CONCERN: (any triage escalations, high no-show rates, negative feedback trends)\n" +
+            "RECOMMENDATIONS: (3-5 specific, actionable improvement recommendations)\n" +
+            "CONCLUSION: (2-3 closing sentences)\n\n" +
+            "Formal, professional clinical governance tone. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.2, maxTokens: 600)
+               ?? "Insufficient data to generate a clinical audit report. " +
+                  "Please ensure appointment, triage, and feedback data are populated before running this report.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 39. Staff Training Topic Recommender (Admin)
+    // -----------------------------------------------------------------------
+
+    public static string GetTrainingRecommendations(string complaintThemes, string feedbackThemes)
+    {
+        string prompt =
+            "You are a staff development advisor for Portmore Medical Center.\n\n" +
+            "Recurring complaint themes from patients: " + complaintThemes + "\n" +
+            "Recurring feedback themes: " + feedbackThemes + "\n\n" +
+            "Based on these themes, recommend the top 5 staff training priorities. " +
+            "For each recommendation:\n" +
+            "- Name the training topic\n" +
+            "- Explain why it is needed (1-2 sentences referencing the data)\n" +
+            "- Suggest a format (e.g. workshop, e-learning, role play)\n\n" +
+            "Professional, constructive tone. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 400)
+               ?? "1. Patient Communication Skills — Improve clarity and empathy in patient interactions. Format: Workshop.\n" +
+                  "2. Appointment Management — Reduce no-shows through better reminder processes. Format: E-learning.\n" +
+                  "3. Complaint Handling — Equip staff to de-escalate distressed patients. Format: Role play.\n" +
+                  "4. Clinical Documentation — Ensure accurate and timely record-keeping. Format: E-learning.\n" +
+                  "5. Triage Awareness — Ensure front-desk staff can recognise urgent presentations. Format: Workshop.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 40. Meeting Agenda Generator (Admin)
+    // -----------------------------------------------------------------------
+
+    public static string GetMeetingAgenda(string meetingTitle, string attendees,
+        string topics, string meetingDate)
+    {
+        string prompt =
+            "You are an executive assistant at Portmore Medical Center.\n\n" +
+            "Meeting title: " + meetingTitle + "\n" +
+            "Date: " + meetingDate + "\n" +
+            "Attendees: " + attendees + "\n" +
+            "Discussion topics: " + topics + "\n\n" +
+            "Generate a professional, structured meeting agenda with:\n" +
+            "- Header (title, date, attendees)\n" +
+            "- Welcome & Apologies (5 min)\n" +
+            "- One agenda item per topic with a suggested time allocation\n" +
+            "- Any Other Business (5 min)\n" +
+            "- Next Steps & Close\n\n" +
+            "Professional, concise format. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.3, maxTokens: 400)
+               ?? "MEETING AGENDA\n" +
+                  "Title: " + meetingTitle + "\n" +
+                  "Date: " + meetingDate + "\n" +
+                  "Attendees: " + attendees + "\n\n" +
+                  "1. Welcome & Apologies (5 min)\n" +
+                  "2. Discussion Items: " + topics + "\n" +
+                  "3. Any Other Business (5 min)\n" +
+                  "4. Next Steps & Close";
+    }
 }

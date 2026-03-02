@@ -447,11 +447,148 @@
     </div>
 
     <!-- Quick link to Staff Bio Generator -->
-    <div class="alert alert-info" style="margin-bottom:40px;">
+    <div class="alert alert-info" style="margin-bottom:30px;">
       <span class="glyphicon glyphicon-user"></span>
       &nbsp;<strong>Staff Bio Generator:</strong>
       Create polished doctor biographies for the website.
       <a href="StaffBioGenerator.aspx" class="btn btn-info btn-sm pull-right">Open Bio Generator</a>
+    </div>
+
+    <!-- ===== Staff Performance Report ===== -->
+    <div class="panel panel-default" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-signal"></span> Staff Performance Report
+          <asp:Button ID="BtnPerformanceReport" runat="server" Text="Generate Report"
+              CssClass="btn btn-xs btn-primary pull-right" OnClick="BtnPerformanceReport_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">Cross-references appointment volumes, triage levels, no-show rates, and patient feedback to produce a management performance report.</p>
+        <asp:Panel ID="PanelPerformanceReport" runat="server" Visible="false">
+          <div class="alert alert-default" style="background:#f9f9f9;border:1px solid #ddd;white-space:pre-wrap;">
+            <asp:Literal ID="LitPerformanceReport" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Clinical Audit Report ===== -->
+    <div class="panel panel-info" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-folder-open"></span> Clinical Audit Report
+          <asp:Button ID="BtnAuditReport" runat="server" Text="Generate Audit"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnAuditReport_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">Formal clinical governance report covering triage distribution, no-show rates, complaint themes, and feedback trends with recommendations.</p>
+        <asp:Panel ID="PanelAuditReport" runat="server" Visible="false">
+          <div class="alert alert-info" style="white-space:pre-wrap;">
+            <asp:Literal ID="LitAuditReport" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Staff Training Topic Recommender ===== -->
+    <div class="panel panel-warning" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-education"></span> Staff Training Topic Recommender
+          <asp:Button ID="BtnTraining" runat="server" Text="Get Recommendations"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnTraining_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">Analyses complaint and feedback themes to recommend the top 5 staff training priorities, each with a suggested format.</p>
+        <asp:Panel ID="PanelTraining" runat="server" Visible="false">
+          <div class="alert alert-warning" style="white-space:pre-wrap;">
+            <asp:Literal ID="LitTraining" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Social Media Post Generator ===== -->
+    <div class="panel panel-success" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-share"></span> Social Media Post Generator
+          <asp:Button ID="BtnSocialPost" runat="server" Text="Generate Post"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnSocialPost_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              <label style="font-size:13px;">Topic / Health Awareness Theme</label>
+              <asp:TextBox ID="TxtSocialTopic" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. World Heart Day, diabetes awareness, staying active..." />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label style="font-size:13px;">Platform</label>
+              <asp:DropDownList ID="DdlSocialPlatform" runat="server" CssClass="form-control input-sm">
+                <asp:ListItem>Facebook</asp:ListItem>
+                <asp:ListItem>Instagram</asp:ListItem>
+                <asp:ListItem>Twitter / X</asp:ListItem>
+                <asp:ListItem>LinkedIn</asp:ListItem>
+              </asp:DropDownList>
+            </div>
+          </div>
+        </div>
+        <asp:Panel ID="PanelSocialPost" runat="server" Visible="false">
+          <div class="alert alert-success" style="white-space:pre-wrap;">
+            <asp:Literal ID="LitSocialPost" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Meeting Agenda Generator ===== -->
+    <div class="panel panel-default" style="margin-top:10px;margin-bottom:40px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-list-alt"></span> Meeting Agenda Generator
+          <asp:Button ID="BtnAgenda" runat="server" Text="Generate Agenda"
+              CssClass="btn btn-xs btn-primary pull-right" OnClick="BtnAgenda_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Meeting Title</label>
+              <asp:TextBox ID="TxtMeetingTitle" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Monthly Clinical Governance Meeting" />
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Attendees</label>
+              <asp:TextBox ID="TxtMeetingAttendees" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Dr. Smith, Head Nurse, Admin Manager..." />
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Meeting Date</label>
+              <asp:TextBox ID="TxtMeetingDate" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. 10 March 2026" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="font-size:13px;">Discussion Topics (one per line)</label>
+          <asp:TextBox ID="TxtMeetingTopics" runat="server" TextMode="MultiLine" Rows="3"
+              CssClass="form-control input-sm"
+              placeholder="e.g. Review of triage escalation data&#10;Patient feedback analysis&#10;Staffing rota for next month" />
+        </div>
+        <asp:Panel ID="PanelAgenda" runat="server" Visible="false">
+          <div class="alert alert-default" style="background:#f9f9f9;border:1px solid #ddd;white-space:pre-wrap;">
+            <asp:Literal ID="LitAgenda" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
     </div>
 
  </div>

@@ -485,4 +485,101 @@ public partial class AdminView : System.Web.UI.Page
                 break;
         }
     }
+
+    // -----------------------------------------------------------------------
+    // Staff Performance Report
+    // -----------------------------------------------------------------------
+
+    protected void BtnPerformanceReport_Click(object sender, EventArgs e)
+    {
+        string apptData     = BuildAppointmentSummary();
+        string fbData       = BuildFeedbackSummaryData();
+        string report       = OpenAIService.GetStaffPerformanceReport(apptData, fbData);
+        LitPerformanceReport.Text      = System.Web.HttpUtility.HtmlEncode(report);
+        PanelPerformanceReport.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Clinical Audit Report
+    // -----------------------------------------------------------------------
+
+    protected void BtnAuditReport_Click(object sender, EventArgs e)
+    {
+        var auditSb = new StringBuilder();
+        auditSb.AppendLine("=== APPOINTMENT & TRIAGE DATA ===");
+        auditSb.AppendLine(BuildAppointmentSummary());
+        auditSb.AppendLine("=== PATIENT FEEDBACK DATA ===");
+        auditSb.AppendLine(BuildFeedbackSummaryData());
+        auditSb.AppendLine("=== CONTACT SENTIMENT DATA ===");
+        auditSb.AppendLine(BuildContactSentimentSummary());
+
+        string report      = OpenAIService.GetClinicalAuditReport(auditSb.ToString());
+        LitAuditReport.Text      = System.Web.HttpUtility.HtmlEncode(report);
+        PanelAuditReport.Visible = true;
+    }
+
+    private string BuildContactSentimentSummary()
+    {
+        var sb = new StringBuilder();
+        try
+        {
+            using (SqlConnection conn = connectionManager.GetMembersConnection())
+            using (var cmd = new SqlCommand(
+                "SELECT Sentiment, COUNT(*) AS Cnt FROM [Contacts] " +
+                "WHERE Sentiment IS NOT NULL GROUP BY Sentiment ORDER BY Cnt DESC", conn))
+            using (var rdr = cmd.ExecuteReader())
+            {
+                while (rdr.Read())
+                    sb.AppendLine("  " + rdr["Sentiment"] + ": " + rdr["Cnt"]);
+            }
+        }
+        catch { sb.AppendLine("(data unavailable)"); }
+        return sb.Length > 0 ? sb.ToString() : "No contact sentiment data available.";
+    }
+
+    // -----------------------------------------------------------------------
+    // Staff Training Topic Recommender
+    // -----------------------------------------------------------------------
+
+    protected void BtnTraining_Click(object sender, EventArgs e)
+    {
+        string complaintThemes = BuildContactSentimentSummary();
+        string feedbackThemes  = BuildFeedbackSummaryData();
+        string recs            = OpenAIService.GetTrainingRecommendations(complaintThemes, feedbackThemes);
+        LitTraining.Text      = System.Web.HttpUtility.HtmlEncode(recs);
+        PanelTraining.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Social Media Post Generator
+    // -----------------------------------------------------------------------
+
+    protected void BtnSocialPost_Click(object sender, EventArgs e)
+    {
+        string topic    = TxtSocialTopic.Text.Trim();
+        string platform = DdlSocialPlatform.SelectedValue;
+        if (string.IsNullOrWhiteSpace(topic)) topic = "general health awareness";
+        string post           = OpenAIService.GetSocialMediaPost(topic, platform);
+        LitSocialPost.Text    = System.Web.HttpUtility.HtmlEncode(post);
+        PanelSocialPost.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Meeting Agenda Generator
+    // -----------------------------------------------------------------------
+
+    protected void BtnAgenda_Click(object sender, EventArgs e)
+    {
+        string title     = TxtMeetingTitle.Text.Trim();
+        string attendees = TxtMeetingAttendees.Text.Trim();
+        string topics    = TxtMeetingTopics.Text.Trim();
+        string date      = TxtMeetingDate.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(title)) title = "Clinical Meeting";
+        if (string.IsNullOrWhiteSpace(date))  date  = DateTime.Now.ToString("dd MMMM yyyy");
+
+        string agenda      = OpenAIService.GetMeetingAgenda(title, attendees, topics, date);
+        LitAgenda.Text     = System.Web.HttpUtility.HtmlEncode(agenda);
+        PanelAgenda.Visible = true;
+    }
 }

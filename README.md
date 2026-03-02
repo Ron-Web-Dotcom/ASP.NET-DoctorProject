@@ -1,6 +1,6 @@
 # Portmore Medical Center — ASP.NET Web Application
 
-A full-featured medical clinic web application built with **ASP.NET Web Forms (.NET 4.5)** and **SQL Server LocalDB**, enhanced with **20 GPT-4–powered AI features** across patient-facing and admin workflows.
+A full-featured medical clinic web application built with **ASP.NET Web Forms (.NET 4.5)** and **SQL Server LocalDB**, enhanced with **40 GPT-4–powered AI features** across patient-facing and admin workflows.
 
 ---
 
@@ -329,6 +329,54 @@ GPT-4 assigns a triage priority (**Urgent / High / Medium / Low**) and a 2–3 s
 
 ---
 
+### 30. Emergency Symptom Triage
+**Page:** `EmergencyTriage.aspx`
+**Method:** `OpenAIService.GetEmergencyTriage()`
+
+Patient describes their symptoms in a free-text box. GPT-4 classifies the situation into exactly one of four urgency levels — **EMERGENCY / URGENT / APPOINTMENT / SELF-CARE** — with a colour-coded banner, a reason, and clear next-step instructions. Uses temperature 0.1 for maximum consistency. Always reminds the patient to call 999 if in doubt. Accessible from the AI Tools navbar.
+
+---
+
+### 31. Medical History Summariser
+**Page:** `MedicalHistory.aspx`
+**Method:** `OpenAIService.GetMedicalHistorySummary()`
+
+Patient fills in structured fields: current conditions, medications, allergies, past surgeries, and family history. GPT-4 generates a concise, professional clinical summary suitable for sharing with any healthcare provider. The result page includes a **Print** button so patients can bring a physical copy to appointments.
+
+---
+
+### 32. Mental Health Check-In
+**Page:** `MentalHealthCheckIn.aspx`
+**Method:** `OpenAIService.GetMentalHealthCheckIn()`
+
+Five dropdown ratings (1–5) covering mood, sleep quality, anxiety, energy, and social connection, plus an optional free-text notes field. GPT-4 returns an empathetic wellbeing summary, 3–4 evidence-based suggestions, and guidance on when to seek professional help. Includes crisis line signposting in the disclaimer.
+
+---
+
+### 33. Health Goal Planner
+**Page:** `HealthGoalPlanner.aspx`
+**Method:** `OpenAIService.GetHealthGoalPlan()`
+
+Patient enters a health goal (e.g. "lose 10kg", "lower blood pressure"), their current activity level, and any existing conditions. GPT-4 produces a structured **4-week action plan** with Week 1–4 steps and a "Tips for Success" section. Accessible from the AI Tools navbar.
+
+---
+
+### 34. Second Opinion Question Generator
+**Page:** `SecondOpinionPrompts.aspx`
+**Method:** `OpenAIService.GetSecondOpinionQuestions()`
+
+Patient pastes or types a diagnosis or treatment plan. GPT-4 generates 8–10 intelligent questions grouped into: *Understanding the Diagnosis*, *Treatment Options*, and *Next Steps & Lifestyle*. The result page includes a **Print** button so patients can bring the list to their next appointment.
+
+---
+
+### 35. Post-Treatment Recovery Tracker
+**Page:** `RecoveryTracker.aspx`
+**Method:** `OpenAIService.AnalyseRecovery()`
+
+Multi-entry recovery log (similar in design to the Symptom Diary). Patient adds daily entries with a date and free-text recovery note. Once 2+ entries exist, an **Analyse My Recovery** button calls GPT-4, which returns a recovery trend, positive signs, areas to watch, and a colour-coded recommendation badge: *On Track / Contact Care Team / Contact Doctor Promptly*. Entries are session-based.
+
+---
+
 ### 12. Triage Escalation Alert
 **Location:** Top of `AdminView.aspx`
 **Method:** DB query on `Page_Load`
@@ -426,6 +474,46 @@ Admin enters a doctor's name, specialty, qualifications, years of experience, an
 
 ---
 
+### 36. Staff Performance Report
+**Location:** `AdminView.aspx` — Staff Performance Report panel
+**Method:** `OpenAIService.GetStaffPerformanceReport()`
+
+Combines appointment volume data, triage distribution, no-show rates, and patient feedback into a single GPT-4 management report covering: busiest departments, patient satisfaction trends, operational concerns, and 3 specific actionable recommendations for the management team.
+
+---
+
+### 37. Clinical Audit Report
+**Location:** `AdminView.aspx` — Clinical Audit Report panel
+**Method:** `OpenAIService.GetClinicalAuditReport()`
+
+Pulls appointment data, triage breakdown, no-show rates, feedback sentiment, and contact sentiment into a formal clinical governance document with: Executive Summary, Key Findings, Areas of Concern, Recommendations, and Conclusion. Suitable for clinical governance meetings.
+
+---
+
+### 38. Staff Training Topic Recommender
+**Location:** `AdminView.aspx` — Staff Training Topic Recommender panel
+**Method:** `OpenAIService.GetTrainingRecommendations()`
+
+Analyses complaint themes from the Contacts table and feedback themes from the Feedback table to recommend the top 5 staff training priorities, each with a justification and a suggested training format (workshop, e-learning, or role play).
+
+---
+
+### 39. Social Media Post Generator
+**Location:** `AdminView.aspx` — Social Media Post Generator panel
+**Method:** `OpenAIService.GetSocialMediaPost()`
+
+Admin enters a health awareness topic and selects a platform (Facebook, Instagram, Twitter/X, LinkedIn). GPT-4 writes a ready-to-post message with appropriate length, tone, call-to-action, and 3–5 relevant hashtags for the chosen platform.
+
+---
+
+### 40. Meeting Agenda Generator
+**Location:** `AdminView.aspx` — Meeting Agenda Generator panel
+**Method:** `OpenAIService.GetMeetingAgenda()`
+
+Admin provides a meeting title, attendees, discussion topics (one per line), and date. GPT-4 generates a professionally structured meeting agenda with a header, timed agenda items per topic, Any Other Business, and a Next Steps & Close section.
+
+---
+
 ## All Pages Reference
 
 | Page | Role | Description |
@@ -500,6 +588,17 @@ All AI calls are centralised in `App_Code/OpenAIService.cs`. Every public method
 | `GetInsuranceGuide()` | Insurance coverage guide & questions to ask | `string` |
 | `GetDoctorFocusSummary()` | 2-sentence focus summary per doctor | `string` |
 | `GetFeedbackSummary()` | Executive summary of all patient feedback | `string` |
+| `GetEmergencyTriage()` | 4-level urgency classification with action steps | `string` |
+| `GetMedicalHistorySummary()` | Structured clinical summary from patient history | `string` |
+| `GetMentalHealthCheckIn()` | Wellbeing summary + support suggestions from 5 scores | `string` |
+| `GetHealthGoalPlan()` | Personalised 4-week health goal action plan | `string` |
+| `GetSecondOpinionQuestions()` | 8-10 smart questions from a diagnosis or treatment plan | `string` |
+| `AnalyseRecovery()` | Recovery trend analysis + recommendation badge | `string` |
+| `GetStaffPerformanceReport()` | Management performance report from combined data | `string` |
+| `GetClinicalAuditReport()` | Formal clinical governance audit document | `string` |
+| `GetTrainingRecommendations()` | Top 5 staff training priorities from complaint/feedback data | `string` |
+| `GetSocialMediaPost()` | Platform-specific health awareness social post | `string` |
+| `GetMeetingAgenda()` | Structured clinical meeting agenda | `string` |
 
 ---
 
