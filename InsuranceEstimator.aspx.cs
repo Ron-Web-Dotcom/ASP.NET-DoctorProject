@@ -11,8 +11,14 @@ using System.Web.UI;
 /// </summary>
 public partial class InsuranceEstimator : System.Web.UI.Page
 {
+    /// <summary>Standard page lifecycle handler. No initialisation required on first load.</summary>
     protected void Page_Load(object sender, EventArgs e) { }
 
+    /// <summary>
+    /// Handles the Get Insurance Guide button click.
+    /// Validates the service dropdown, calls GetInsuranceGuide, HTML-encodes the result,
+    /// and reveals the result panel with the service and insurance type displayed.
+    /// </summary>
     protected void BtnEstimate_Click(object sender, EventArgs e)
     {
         string service       = DdlService.SelectedValue;

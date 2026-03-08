@@ -11,8 +11,14 @@ using System.Web.UI;
 /// </summary>
 public partial class LifestylePlanner : System.Web.UI.Page
 {
+    /// <summary>Standard page lifecycle handler. No initialisation required on first load.</summary>
     protected void Page_Load(object sender, EventArgs e) { }
 
+    /// <summary>
+    /// Handles the Generate My Plan button click.
+    /// Validates the specialty dropdown, calls GetLifestylePlan, HTML-encodes the result,
+    /// and reveals the result panel.
+    /// </summary>
     protected void BtnGenerate_Click(object sender, EventArgs e)
     {
         string specialty   = DdlSpecialty.SelectedValue;

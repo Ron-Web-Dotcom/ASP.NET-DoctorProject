@@ -37,8 +37,14 @@ public partial class DoctorAvailability : System.Web.UI.Page
                 new DoctorInfo("Dr. Jag Ahluwalia",     "Surgery",             "10:00 AM – 11:00 AM,2:00 PM – 3:00 PM,4:00 PM – 5:00 PM") }},
         };
 
+    /// <summary>Standard page lifecycle handler. No initialisation required on first load.</summary>
     protected void Page_Load(object sender, EventArgs e) { }
 
+    /// <summary>
+    /// Handles the View Doctors button click.
+    /// Looks up the specialty in the static Roster dictionary, calls GetDoctorFocusSummary
+    /// once per doctor to generate a GPT-4 summary, then binds the enriched list to the Repeater.
+    /// </summary>
     protected void BtnView_Click(object sender, EventArgs e)
     {
         string specialty = DdlSpecialty.SelectedValue;
@@ -88,12 +94,21 @@ public partial class DoctorAvailability : System.Web.UI.Page
         return sb.ToString();
     }
 
-    // Simple data holder
+    /// <summary>
+    /// Immutable data holder for a single doctor entry in the static Roster.
+    /// </summary>
     private class DoctorInfo
     {
-        public string Name     { get; }
-        public string Specialty{ get; }
-        public string Slots    { get; }
+        /// <summary>Full name including title (e.g. "Dr. Kate Lancaster").</summary>
+        public string Name      { get; }
+
+        /// <summary>The specialty this doctor covers.</summary>
+        public string Specialty { get; }
+
+        /// <summary>Comma-separated list of typical available time slots.</summary>
+        public string Slots     { get; }
+
+        /// <summary>Initialises a new DoctorInfo with all required fields.</summary>
         public DoctorInfo(string name, string specialty, string slots)
         { Name = name; Specialty = specialty; Slots = slots; }
     }
