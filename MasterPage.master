@@ -127,6 +127,12 @@
                                 <li><a href="HealthGoalPlanner.aspx"><span class="glyphicon glyphicon-flag"></span> Health Goal Planner</a></li>
                                 <li><a href="SecondOpinionPrompts.aspx"><span class="glyphicon glyphicon-question-sign"></span> Second Opinion Questions</a></li>
                                 <li><a href="RecoveryTracker.aspx"><span class="glyphicon glyphicon-stats"></span> Recovery Tracker</a></li>
+                                <li class="divider"></li>
+                                <li><a href="AppointmentEmailPreview.aspx"><span class="glyphicon glyphicon-envelope"></span> Appointment Email Preview</a></li>
+                                <li><a href="AllergyFoodGuide.aspx"><span class="glyphicon glyphicon-apple"></span> Allergy &amp; Food Guide</a></li>
+                                <li><a href="PreSurgerySupport.aspx"><span class="glyphicon glyphicon-heart"></span> Pre-Surgery Support</a></li>
+                                <li><a href="SpecialistComparison.aspx"><span class="glyphicon glyphicon-transfer"></span> Specialist Comparison</a></li>
+                                <li><a href="HealthAgeCalculator.aspx"><span class="glyphicon glyphicon-dashboard"></span> Health Age Calculator</a></li>
                             </ul>
                         </li>
                         <!-- Feature 4: Language toggle — translates current page content via TranslateHandler.ashx -->

@@ -591,6 +591,258 @@
       </div>
     </div>
 
+    <h3 style="margin-top:40px;border-top:2px solid #eee;padding-top:20px;">
+      <span class="glyphicon glyphicon-tasks"></span> Clinical Documents
+    </h3>
+    <p class="text-muted">Generate formal clinical and HR documents using GPT-4.</p>
+
+    <!-- ===== Patient Discharge Summary Generator ===== -->
+    <div class="panel panel-info" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-file"></span> Patient Discharge Summary Generator
+          <asp:Button ID="BtnDischarge" runat="server" Text="Generate Summary"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnDischarge_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:13px;">Patient Name</label>
+              <asp:TextBox ID="TxtDischargePatient" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Maria Brown" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:13px;">Diagnosis</label>
+              <asp:TextBox ID="TxtDischargeDiagnosis" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Hypertension, Type 2 Diabetes" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="font-size:13px;">Treatment Provided</label>
+          <asp:TextBox ID="TxtDischargeTreatment" runat="server" TextMode="MultiLine" Rows="2"
+              CssClass="form-control input-sm"
+              placeholder="e.g. Blood pressure medication adjusted. Lifestyle counselling provided." />
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:13px;">Discharge Medications <small class="text-muted">(optional)</small></label>
+              <asp:TextBox ID="TxtDischargeMedications" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Amlodipine 5mg once daily, Metformin 500mg twice daily" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label style="font-size:13px;">Follow-Up Instructions <small class="text-muted">(optional)</small></label>
+              <asp:TextBox ID="TxtDischargeFollowUp" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Review with GP in 4 weeks. Repeat bloods in 3 months." />
+            </div>
+          </div>
+        </div>
+        <asp:Panel ID="PanelDischarge" runat="server" Visible="false">
+          <div class="alert alert-info" style="white-space:pre-wrap;">
+            <button type="button" class="btn btn-xs btn-default pull-right" onclick="window.print()">
+              <span class="glyphicon glyphicon-print"></span> Print
+            </button>
+            <asp:Literal ID="LitDischarge" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== AI Press Release Generator ===== -->
+    <div class="panel panel-success" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-bullhorn"></span> AI Press Release Generator
+          <asp:Button ID="BtnPressRelease" runat="server" Text="Generate Press Release"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnPressRelease_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group">
+              <label style="font-size:13px;">News Topic / Announcement</label>
+              <asp:TextBox ID="TxtPressReleaseTopic" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. New MRI scanner installed, flu vaccination clinic launched..." />
+            </div>
+          </div>
+          <div class="col-sm-7">
+            <div class="form-group">
+              <label style="font-size:13px;">Key Points to Include <small class="text-muted">(optional)</small></label>
+              <asp:TextBox ID="TxtPressReleasePoints" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Available from March 2026, benefits 500 patients per year..." />
+            </div>
+          </div>
+        </div>
+        <asp:Panel ID="PanelPressRelease" runat="server" Visible="false">
+          <div class="alert alert-success" style="white-space:pre-wrap;">
+            <asp:Literal ID="LitPressRelease" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Job Description Generator ===== -->
+    <div class="panel panel-warning" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-briefcase"></span> Job Description Generator
+          <asp:Button ID="BtnJobDescription" runat="server" Text="Generate JD"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnJobDescription_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Job Title / Role</label>
+              <asp:TextBox ID="TxtJobTitle" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Senior Practice Nurse" />
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Department</label>
+              <asp:TextBox ID="TxtJobDepartment" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Cardiology, General Practice, Radiology..." />
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Key Requirements <small class="text-muted">(optional)</small></label>
+              <asp:TextBox ID="TxtJobRequirements" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. 3 years clinical experience, NMC registration..." />
+            </div>
+          </div>
+        </div>
+        <asp:Panel ID="PanelJobDescription" runat="server" Visible="false">
+          <div class="alert alert-warning" style="white-space:pre-wrap;">
+            <button type="button" class="btn btn-xs btn-default pull-right" onclick="window.print()">
+              <span class="glyphicon glyphicon-print"></span> Print
+            </button>
+            <asp:Literal ID="LitJobDescription" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Clinical Incident Report Writer ===== -->
+    <div class="panel panel-danger" style="margin-top:10px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-exclamation-sign"></span> Clinical Incident Report Writer
+          <asp:Button ID="BtnIncidentReport" runat="server" Text="Generate Report"
+              CssClass="btn btn-xs btn-default pull-right" OnClick="BtnIncidentReport_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          Converts a free-text incident description into a formal clinical governance report.
+        </p>
+        <div class="form-group">
+          <label style="font-size:13px;">Incident Description</label>
+          <asp:TextBox ID="TxtIncidentDescription" runat="server" TextMode="MultiLine" Rows="3"
+              CssClass="form-control input-sm"
+              placeholder="Describe what happened in your own words..." />
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Date of Incident <small class="text-muted">(optional)</small></label>
+              <asp:TextBox ID="TxtIncidentDate" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. 15 March 2026" />
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size:13px;">Location <small class="text-muted">(optional)</small></label>
+              <asp:TextBox ID="TxtIncidentLocation" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. Cardiology Ward, Reception, Car Park..." />
+            </div>
+          </div>
+        </div>
+        <asp:Panel ID="PanelIncidentReport" runat="server" Visible="false">
+          <div class="alert alert-danger" style="white-space:pre-wrap;">
+            <button type="button" class="btn btn-xs btn-default pull-right" onclick="window.print()">
+              <span class="glyphicon glyphicon-print"></span> Print
+            </button>
+            <asp:Literal ID="LitIncidentReport" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
+    <!-- ===== Patient DNA Letter Generator ===== -->
+    <div class="panel panel-default" style="margin-top:10px;margin-bottom:40px;">
+      <div class="panel-heading">
+        <h4 class="panel-title"><span class="glyphicon glyphicon-envelope"></span> Patient DNA (Did Not Attend) Letter
+          <asp:Button ID="BtnDnaLetter" runat="server" Text="Generate Letter"
+              CssClass="btn btn-xs btn-primary pull-right" OnClick="BtnDnaLetter_Click" />
+        </h4>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted" style="font-size:13px;">
+          Generates a compassionate DNA letter for a patient who missed their appointment without cancellation.
+        </p>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label style="font-size:13px;">Patient Name</label>
+              <asp:TextBox ID="TxtDnaPatient" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. John Smith" />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label style="font-size:13px;">Service Missed</label>
+              <asp:DropDownList ID="DdlDnaService" runat="server" CssClass="form-control input-sm">
+                <asp:ListItem>Cardiology</asp:ListItem>
+                <asp:ListItem>General Practitioner</asp:ListItem>
+                <asp:ListItem>Gynaecology</asp:ListItem>
+                <asp:ListItem>Opticology</asp:ListItem>
+                <asp:ListItem>Paediatrician</asp:ListItem>
+                <asp:ListItem>Radiology</asp:ListItem>
+                <asp:ListItem>Surgeon</asp:ListItem>
+              </asp:DropDownList>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label style="font-size:13px;">Appointment Date</label>
+              <asp:TextBox ID="TxtDnaDate" runat="server" CssClass="form-control input-sm"
+                  placeholder="e.g. 10 March 2026" />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label style="font-size:13px;">Time Slot</label>
+              <asp:DropDownList ID="DdlDnaTimeSlot" runat="server" CssClass="form-control input-sm">
+                <asp:ListItem>8:00 AM – 9:00 AM</asp:ListItem>
+                <asp:ListItem>9:00 AM – 10:00 AM</asp:ListItem>
+                <asp:ListItem>11:00 AM – 12:00 PM</asp:ListItem>
+                <asp:ListItem>12:00 PM – 1:00 PM</asp:ListItem>
+                <asp:ListItem>1:00 PM – 2:00 PM</asp:ListItem>
+                <asp:ListItem>2:00 PM – 3:00 PM</asp:ListItem>
+                <asp:ListItem>3:00 PM – 4:00 PM</asp:ListItem>
+                <asp:ListItem>4:00 PM – 5:00 PM</asp:ListItem>
+              </asp:DropDownList>
+            </div>
+          </div>
+        </div>
+        <asp:Panel ID="PanelDnaLetter" runat="server" Visible="false">
+          <div class="alert alert-default" style="background:#f9f9f9;border:1px solid #ddd;white-space:pre-wrap;">
+            <button type="button" class="btn btn-xs btn-default pull-right" onclick="window.print()">
+              <span class="glyphicon glyphicon-print"></span> Print
+            </button>
+            <asp:Literal ID="LitDnaLetter" runat="server" />
+          </div>
+        </asp:Panel>
+      </div>
+    </div>
+
  </div>
 
 </asp:Content>

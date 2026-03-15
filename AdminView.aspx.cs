@@ -582,4 +582,126 @@ public partial class AdminView : System.Web.UI.Page
         LitAgenda.Text     = System.Web.HttpUtility.HtmlEncode(agenda);
         PanelAgenda.Visible = true;
     }
+
+    // -----------------------------------------------------------------------
+    // Patient Discharge Summary Generator
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Handles the Generate Discharge Summary button click.
+    /// Reads clinical details from the form, calls <see cref="OpenAIService.GetDischargeSummary"/>,
+    /// and renders the formatted summary in the result panel.
+    /// </summary>
+    protected void BtnDischarge_Click(object sender, EventArgs e)
+    {
+        string patient    = TxtDischargePatient.Text.Trim();
+        string diagnosis  = TxtDischargeDiagnosis.Text.Trim();
+        string treatment  = TxtDischargeTreatment.Text.Trim();
+        string meds       = TxtDischargeMedications.Text.Trim();
+        string followUp   = TxtDischargeFollowUp.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(patient))   patient   = "Patient";
+        if (string.IsNullOrWhiteSpace(diagnosis)) diagnosis = "Not specified";
+        if (string.IsNullOrWhiteSpace(treatment)) treatment = "Not specified";
+
+        string summary        = OpenAIService.GetDischargeSummary(patient, diagnosis, treatment, meds, followUp);
+        LitDischarge.Text     = System.Web.HttpUtility.HtmlEncode(summary);
+        PanelDischarge.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // AI Press Release Generator
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Handles the Generate Press Release button click.
+    /// Passes the topic and key points to <see cref="OpenAIService.GetPressRelease"/>
+    /// and renders the result in the result panel.
+    /// </summary>
+    protected void BtnPressRelease_Click(object sender, EventArgs e)
+    {
+        string topic      = TxtPressReleaseTopic.Text.Trim();
+        string keyPoints  = TxtPressReleasePoints.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(topic)) topic = "general clinic news";
+
+        string release          = OpenAIService.GetPressRelease(topic, keyPoints);
+        LitPressRelease.Text    = System.Web.HttpUtility.HtmlEncode(release);
+        PanelPressRelease.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Job Description Generator
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Handles the Generate JD button click.
+    /// Reads the role title, department, and requirements from the form,
+    /// calls <see cref="OpenAIService.GetJobDescription"/>, and renders the result.
+    /// </summary>
+    protected void BtnJobDescription_Click(object sender, EventArgs e)
+    {
+        string title        = TxtJobTitle.Text.Trim();
+        string department   = TxtJobDepartment.Text.Trim();
+        string requirements = TxtJobRequirements.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(title))      title      = "Clinical Role";
+        if (string.IsNullOrWhiteSpace(department)) department = "General";
+
+        string jd                   = OpenAIService.GetJobDescription(title, department, requirements);
+        LitJobDescription.Text      = System.Web.HttpUtility.HtmlEncode(jd);
+        PanelJobDescription.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Clinical Incident Report Writer
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Handles the Generate Incident Report button click.
+    /// Reads the incident description, date, and location from the form,
+    /// calls <see cref="OpenAIService.GetIncidentReport"/>, and renders the result.
+    /// </summary>
+    protected void BtnIncidentReport_Click(object sender, EventArgs e)
+    {
+        string description = TxtIncidentDescription.Text.Trim();
+        string date        = TxtIncidentDate.Text.Trim();
+        string location    = TxtIncidentLocation.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            LitIncidentReport.Text      = System.Web.HttpUtility.HtmlEncode("Please enter an incident description.");
+            PanelIncidentReport.Visible = true;
+            return;
+        }
+
+        string report              = OpenAIService.GetIncidentReport(description, date, location);
+        LitIncidentReport.Text     = System.Web.HttpUtility.HtmlEncode(report);
+        PanelIncidentReport.Visible = true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Patient DNA (Did Not Attend) Letter Generator
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Handles the Generate DNA Letter button click.
+    /// Reads the patient name, service, appointment date, and time slot from
+    /// the form, calls <see cref="OpenAIService.GetDnaLetter"/>, and renders
+    /// the compassionate DNA letter in the result panel.
+    /// </summary>
+    protected void BtnDnaLetter_Click(object sender, EventArgs e)
+    {
+        string patient  = TxtDnaPatient.Text.Trim();
+        string service  = DdlDnaService.SelectedValue;
+        string date     = TxtDnaDate.Text.Trim();
+        string timeSlot = DdlDnaTimeSlot.SelectedValue;
+
+        if (string.IsNullOrWhiteSpace(patient)) patient = "Patient";
+        if (string.IsNullOrWhiteSpace(date))    date    = "the scheduled date";
+
+        string letter        = OpenAIService.GetDnaLetter(patient, service, date, timeSlot);
+        LitDnaLetter.Text    = System.Web.HttpUtility.HtmlEncode(letter);
+        PanelDnaLetter.Visible = true;
+    }
 }

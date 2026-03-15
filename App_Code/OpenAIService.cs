@@ -1377,4 +1377,433 @@ public static class OpenAIService
                   "3. Any Other Business (5 min)\n" +
                   "4. Next Steps & Close";
     }
+
+    // -----------------------------------------------------------------------
+    // 41. Appointment Confirmation Email Preview (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Drafts a warm, personalised appointment confirmation email that the patient
+    /// can copy and send to themselves or a carer. Includes preparation reminders
+    /// tailored to the specific service booked.
+    /// </summary>
+    /// <param name="patientName">Full name of the patient.</param>
+    /// <param name="service">Clinic service booked (e.g. "Cardiology").</param>
+    /// <param name="timeSlot">Selected appointment time slot.</param>
+    /// <param name="appointmentDate">Date of the appointment as a string.</param>
+    /// <returns>Full plain-text email draft ready to copy.</returns>
+    public static string GetConfirmationEmailDraft(string patientName, string service,
+        string timeSlot, string appointmentDate)
+    {
+        string prompt =
+            "You are a patient services coordinator at Portmore Medical Center.\n\n" +
+            "Draft a friendly appointment confirmation email for the following booking:\n" +
+            "Patient name: " + patientName + "\n" +
+            "Service: " + service + "\n" +
+            "Date: " + appointmentDate + "\n" +
+            "Time slot: " + timeSlot + "\n\n" +
+            "The email should include:\n" +
+            "1. A warm greeting addressing the patient by name\n" +
+            "2. Confirmation of the appointment details (service, date, time)\n" +
+            "3. 3-4 practical preparation tips specific to " + service + "\n" +
+            "4. Contact details reminder ('Call us if you need to reschedule')\n" +
+            "5. A warm sign-off from 'The Portmore Medical Center Team'\n\n" +
+            "Friendly, professional tone. Plain text only. No HTML.";
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 400)
+               ?? "Dear " + patientName + ",\n\n" +
+                  "Your appointment at Portmore Medical Center has been confirmed.\n\n" +
+                  "Service: " + service + "\n" +
+                  "Date: " + appointmentDate + "\n" +
+                  "Time: " + timeSlot + "\n\n" +
+                  "Please arrive 10 minutes early and bring a valid photo ID, your insurance card, " +
+                  "and a list of any current medications.\n\n" +
+                  "If you need to reschedule, please contact us as soon as possible.\n\n" +
+                  "We look forward to seeing you.\n\nThe Portmore Medical Center Team";
+    }
+
+    // -----------------------------------------------------------------------
+    // 42. AI Allergy & Food Safety Guide (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a personalised food safety guide for a patient based on their
+    /// listed allergies. Covers safe and unsafe foods, label-reading tips, and
+    /// eating-out advice. Includes a medical disclaimer.
+    /// </summary>
+    /// <param name="allergies">Comma-separated list of patient allergies.</param>
+    /// <returns>Structured plain-text allergy and food safety guide.</returns>
+    public static string GetAllergyFoodGuide(string allergies)
+    {
+        string prompt =
+            "You are a dietitian at Portmore Medical Center.\n\n" +
+            "A patient has the following allergies: " + allergies + "\n\n" +
+            "Create a personalised food safety guide with these sections:\n" +
+            "FOODS TO AVOID: (list the key foods and hidden sources for each allergy)\n" +
+            "SAFE FOOD SWAPS: (practical alternatives for common foods they must avoid)\n" +
+            "LABEL READING TIPS: (3-4 tips for spotting allergens on food labels)\n" +
+            "EATING OUT SAFELY: (4 practical tips for dining out with these allergies)\n" +
+            "IMPORTANT REMINDER: End with: 'Always carry any prescribed emergency medication " +
+            "(such as an EpiPen) and consult your doctor or dietitian for personalised advice.'\n\n" +
+            "Friendly, clear language. No jargon. Plain text only. Under 350 words.";
+
+        return CallGpt(prompt, temp: 0.3, maxTokens: 550)
+               ?? "FOODS TO AVOID\nPlease discuss specific foods to avoid with your dietitian or GP " +
+                  "based on your allergy diagnosis.\n\n" +
+                  "LABEL READING TIPS\nAlways check the ingredients list. Look for 'Contains' and 'May contain' " +
+                  "allergen warnings. When in doubt, contact the manufacturer.\n\n" +
+                  "EATING OUT SAFELY\nAlways inform restaurant staff of your allergies when ordering. " +
+                  "Ask about cross-contamination risks in the kitchen.\n\n" +
+                  "IMPORTANT REMINDER\nAlways carry any prescribed emergency medication " +
+                  "(such as an EpiPen) and consult your doctor or dietitian for personalised advice.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 43. Pre-Surgery Anxiety Support (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Provides compassionate, evidence-based pre-operative information and anxiety
+    /// management techniques for a patient awaiting a surgical or procedural appointment.
+    /// Always signposts the clinical team for medical questions.
+    /// </summary>
+    /// <param name="procedureType">The surgery or procedure the patient is facing.</param>
+    /// <param name="concernText">Optional free-text description of the patient's concerns.</param>
+    /// <returns>Supportive plain-text pre-surgery guide.</returns>
+    public static string GetPreSurgerySupport(string procedureType, string concernText)
+    {
+        string prompt =
+            "You are a compassionate pre-operative support nurse at Portmore Medical Center.\n\n" +
+            "A patient is preparing for: " + procedureType + "\n" +
+            (string.IsNullOrWhiteSpace(concernText) ? "" : "Their main concerns: " + concernText + "\n") + "\n" +
+            "Provide a warm, reassuring pre-surgery support guide with these sections:\n" +
+            "WHAT TO EXPECT: (brief, reassuring overview of a typical " + procedureType + " experience)\n" +
+            "MANAGING ANXIETY: (4-5 evidence-based techniques: breathing, visualisation, etc.)\n" +
+            "PRACTICAL PREPARATION: (4-5 tips for the days before surgery)\n" +
+            "ON THE DAY: (3-4 things to expect when you arrive)\n" +
+            "REMEMBER: End with 'Your clinical team is here to support you every step of the way. " +
+            "Please ask them any medical questions you have.'\n\n" +
+            "Warm, reassuring, empathetic tone. Never minimise concerns. Plain text only. Under 350 words.";
+
+        return CallGpt(prompt, temp: 0.5, maxTokens: 550)
+               ?? "WHAT TO EXPECT\nYour surgical team will ensure you are comfortable and informed " +
+                  "throughout your procedure.\n\n" +
+                  "MANAGING ANXIETY\nTry slow, deep breathing (inhale 4 seconds, hold 4, exhale 6). " +
+                  "Focus on the positive outcome. Talk to someone you trust about your feelings.\n\n" +
+                  "PRACTICAL PREPARATION\nFollow all pre-operative instructions given by your surgeon. " +
+                  "Arrange someone to accompany you. Get a good night's rest beforehand.\n\n" +
+                  "ON THE DAY\nArrive at your scheduled time. The team will introduce themselves and " +
+                  "answer your questions before you go in.\n\n" +
+                  "REMEMBER\nYour clinical team is here to support you every step of the way. " +
+                  "Please ask them any medical questions you have.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 44. Specialist Comparison Tool (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Compares two medical specialties in plain English to help a patient understand
+    /// which specialist is most appropriate for their situation.
+    /// </summary>
+    /// <param name="specialty1">First specialty to compare (e.g. "Cardiology").</param>
+    /// <param name="specialty2">Second specialty to compare (e.g. "General Practitioner").</param>
+    /// <returns>Structured plain-text comparison of both specialties.</returns>
+    public static string GetSpecialistComparison(string specialty1, string specialty2)
+    {
+        string prompt =
+            "You are a patient services advisor at Portmore Medical Center.\n\n" +
+            "A patient wants to understand the difference between seeing a " +
+            specialty1 + " and a " + specialty2 + ".\n\n" +
+            "Write a clear, patient-friendly comparison with these sections:\n" +
+            specialty1.ToUpper() + " — WHAT THEY DO: (2-3 sentences)\n" +
+            specialty1.ToUpper() + " — WHEN TO SEE THEM: (2-3 examples)\n\n" +
+            specialty2.ToUpper() + " — WHAT THEY DO: (2-3 sentences)\n" +
+            specialty2.ToUpper() + " — WHEN TO SEE THEM: (2-3 examples)\n\n" +
+            "KEY DIFFERENCE: (1-2 sentences summarising the core distinction)\n" +
+            "RECOMMENDATION: Brief, neutral guidance on how to decide.\n\n" +
+            "Friendly, jargon-free language. Plain text only. Under 280 words.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 450)
+               ?? specialty1.ToUpper() + " — WHAT THEY DO\nSpecialists in " + specialty1 +
+                  " focus on specific conditions or body systems within their field.\n\n" +
+                  specialty2.ToUpper() + " — WHAT THEY DO\nSpecialists in " + specialty2 +
+                  " focus on specific conditions or body systems within their field.\n\n" +
+                  "KEY DIFFERENCE\nThe right specialist depends on your specific symptoms and GP referral.\n\n" +
+                  "RECOMMENDATION\nSpeak to your GP who can refer you to the most appropriate specialist " +
+                  "based on your individual symptoms and medical history.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 45. Health Age Calculator (Patient)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Estimates a patient's "health age" versus their actual age based on lifestyle
+    /// and health indicators. Provides personalised improvement tips. Includes
+    /// a disclaimer that this is educational, not a clinical assessment.
+    /// </summary>
+    /// <param name="actualAge">Patient's actual chronological age.</param>
+    /// <param name="smokingStatus">Smoking status (e.g. "Non-smoker", "Smoker", "Ex-smoker").</param>
+    /// <param name="exerciseFrequency">Exercise frequency (e.g. "Daily", "2-3x/week", "Rarely").</param>
+    /// <param name="dietQuality">Self-rated diet quality (e.g. "Excellent", "Good", "Poor").</param>
+    /// <param name="sleepHours">Average hours of sleep per night.</param>
+    /// <param name="stressLevel">Self-rated stress level (e.g. "Low", "Moderate", "High").</param>
+    /// <returns>Health age estimate with plain-text lifestyle improvement recommendations.</returns>
+    public static string GetHealthAge(string actualAge, string smokingStatus,
+        string exerciseFrequency, string dietQuality, string sleepHours, string stressLevel)
+    {
+        string prompt =
+            "You are a preventive health advisor at Portmore Medical Center.\n\n" +
+            "A patient has provided the following lifestyle data:\n" +
+            "Actual age: " + actualAge + "\n" +
+            "Smoking status: " + smokingStatus + "\n" +
+            "Exercise frequency: " + exerciseFrequency + "\n" +
+            "Diet quality (self-rated): " + dietQuality + "\n" +
+            "Average sleep per night: " + sleepHours + " hours\n" +
+            "Stress level: " + stressLevel + "\n\n" +
+            "Based on these lifestyle factors, provide:\n" +
+            "HEALTH AGE ESTIMATE: Give an estimated 'health age' (may be higher or lower than actual age) " +
+            "with a brief explanation of which factors influenced it most.\n" +
+            "TOP 3 IMPROVEMENTS: The three lifestyle changes that would have the biggest positive impact.\n" +
+            "POSITIVE HABITS: Acknowledge any good habits already in place.\n" +
+            "DISCLAIMER: End with: 'This is a general wellness estimate for educational purposes only " +
+            "and is not a medical assessment. Please speak to your GP for personalised health advice.'\n\n" +
+            "Encouraging, non-judgmental tone. Plain text only. Under 280 words.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 400)
+               ?? "HEALTH AGE ESTIMATE\nBased on your lifestyle data, we were unable to calculate " +
+                  "your health age at this time.\n\n" +
+                  "TOP 3 IMPROVEMENTS\n1. Regular exercise (aim for 150 min/week)\n" +
+                  "2. Balanced diet with plenty of fruit and vegetables\n" +
+                  "3. 7-9 hours quality sleep per night\n\n" +
+                  "DISCLAIMER\nThis is a general wellness estimate for educational purposes only " +
+                  "and is not a medical assessment. Please speak to your GP for personalised health advice.";
+    }
+
+    // -----------------------------------------------------------------------
+    // 46. Patient Discharge Summary Generator (Admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a formal patient discharge summary document based on the clinical
+    /// details provided by the administering clinician. Suitable for filing or sharing
+    /// with the patient's GP or follow-up care team.
+    /// </summary>
+    /// <param name="patientName">Full name of the patient.</param>
+    /// <param name="diagnosis">Primary diagnosis or diagnoses.</param>
+    /// <param name="treatment">Treatments or interventions carried out.</param>
+    /// <param name="medications">Discharge medications and dosages.</param>
+    /// <param name="followUp">Follow-up instructions or referrals.</param>
+    /// <returns>Formal plain-text discharge summary document.</returns>
+    public static string GetDischargeSummary(string patientName, string diagnosis,
+        string treatment, string medications, string followUp)
+    {
+        string prompt =
+            "You are a clinical documentation specialist at Portmore Medical Center.\n\n" +
+            "Generate a formal patient discharge summary for:\n" +
+            "Patient: " + patientName + "\n" +
+            "Diagnosis: " + diagnosis + "\n" +
+            "Treatment provided: " + treatment + "\n" +
+            "Discharge medications: " + (string.IsNullOrWhiteSpace(medications) ? "None prescribed" : medications) + "\n" +
+            "Follow-up instructions: " + (string.IsNullOrWhiteSpace(followUp) ? "None specified" : followUp) + "\n\n" +
+            "Format the summary with these sections:\n" +
+            "PATIENT DISCHARGE SUMMARY\n" +
+            "Date: [today's date]\n" +
+            "Patient: [name]\n" +
+            "DIAGNOSIS\n" +
+            "TREATMENT PROVIDED\n" +
+            "DISCHARGE MEDICATIONS\n" +
+            "FOLLOW-UP INSTRUCTIONS\n" +
+            "ADDITIONAL NOTES (any relevant clinical observations)\n" +
+            "Prepared by: Portmore Medical Center Clinical Team\n\n" +
+            "Formal clinical documentation tone. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.2, maxTokens: 500)
+               ?? "PATIENT DISCHARGE SUMMARY\n\n" +
+                  "Patient: " + patientName + "\n\n" +
+                  "DIAGNOSIS\n" + diagnosis + "\n\n" +
+                  "TREATMENT PROVIDED\n" + treatment + "\n\n" +
+                  "DISCHARGE MEDICATIONS\n" + (string.IsNullOrWhiteSpace(medications) ? "None prescribed" : medications) + "\n\n" +
+                  "FOLLOW-UP INSTRUCTIONS\n" + (string.IsNullOrWhiteSpace(followUp) ? "Please contact your GP for any concerns." : followUp) + "\n\n" +
+                  "Prepared by: Portmore Medical Center Clinical Team";
+    }
+
+    // -----------------------------------------------------------------------
+    // 47. AI Press Release Generator (Admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a professional press release for Portmore Medical Center based on
+    /// a news topic or announcement provided by admin staff.
+    /// </summary>
+    /// <param name="topic">The news topic or announcement (e.g. "New MRI scanner installed").</param>
+    /// <param name="keyPoints">Comma-separated key points to include in the release.</param>
+    /// <returns>Full plain-text press release ready for distribution.</returns>
+    public static string GetPressRelease(string topic, string keyPoints)
+    {
+        string prompt =
+            "You are a communications manager for Portmore Medical Center.\n\n" +
+            "Write a professional press release about: " + topic + "\n" +
+            "Key points to include: " + (string.IsNullOrWhiteSpace(keyPoints) ? "Not specified" : keyPoints) + "\n\n" +
+            "The press release should include:\n" +
+            "FOR IMMEDIATE RELEASE header\n" +
+            "A compelling headline\n" +
+            "Dateline: Portmore, Jamaica — [date]\n" +
+            "Opening paragraph (the who, what, when, where, why)\n" +
+            "2-3 body paragraphs with supporting detail\n" +
+            "A quote attributed to 'Dr. James Clarke, Medical Director, Portmore Medical Center'\n" +
+            "A brief boilerplate paragraph about Portmore Medical Center\n" +
+            "Contact details: media@portmoremedical.com | +1 (876) 555-0100\n\n" +
+            "Professional journalism style. Plain text only. Under 400 words.";
+
+        return CallGpt(prompt, temp: 0.6, maxTokens: 600)
+               ?? "FOR IMMEDIATE RELEASE\n\n" +
+                  "PORTMORE MEDICAL CENTER ANNOUNCES: " + topic.ToUpper() + "\n\n" +
+                  "Portmore, Jamaica — Portmore Medical Center is pleased to announce " + topic + ". " +
+                  "This development reflects our ongoing commitment to delivering exceptional healthcare " +
+                  "to the communities we serve.\n\n" +
+                  "\"We are proud to continue investing in our patients and services,\" said Dr. James Clarke, " +
+                  "Medical Director, Portmore Medical Center.\n\n" +
+                  "About Portmore Medical Center: Portmore Medical Center is a leading private healthcare " +
+                  "provider offering specialist and general medical services to patients across Jamaica.\n\n" +
+                  "Contact: media@portmoremedical.com | +1 (876) 555-0100";
+    }
+
+    // -----------------------------------------------------------------------
+    // 48. Job Description Generator (Admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a full professional job description for a clinical or administrative
+    /// role at Portmore Medical Center, formatted in an NHS/healthcare style.
+    /// </summary>
+    /// <param name="roleTitle">Job title (e.g. "Senior Practice Nurse").</param>
+    /// <param name="department">Department or specialty.</param>
+    /// <param name="requirements">Key skills or experience requirements (comma-separated).</param>
+    /// <returns>Full plain-text job description.</returns>
+    public static string GetJobDescription(string roleTitle, string department, string requirements)
+    {
+        string prompt =
+            "You are an HR manager at Portmore Medical Center.\n\n" +
+            "Write a professional job description for:\n" +
+            "Role: " + roleTitle + "\n" +
+            "Department: " + department + "\n" +
+            "Key requirements: " + (string.IsNullOrWhiteSpace(requirements) ? "Standard clinical competency" : requirements) + "\n\n" +
+            "Include these sections:\n" +
+            "JOB TITLE\n" +
+            "DEPARTMENT\n" +
+            "REPORTS TO: (suggest an appropriate reporting line)\n" +
+            "JOB SUMMARY: (3-4 sentence overview)\n" +
+            "KEY RESPONSIBILITIES: (6-8 bullet points)\n" +
+            "ESSENTIAL REQUIREMENTS: (5-6 bullet points of must-have qualifications/skills)\n" +
+            "DESIRABLE REQUIREMENTS: (3-4 nice-to-have skills)\n" +
+            "WHAT WE OFFER: (3-4 benefits bullets)\n" +
+            "HOW TO APPLY: 'Please submit your CV and cover letter to careers@portmoremedical.com'\n\n" +
+            "Professional HR tone suitable for a Caribbean private healthcare provider. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 600)
+               ?? "JOB TITLE: " + roleTitle + "\n" +
+                  "DEPARTMENT: " + department + "\n\n" +
+                  "JOB SUMMARY\nPortmore Medical Center is seeking an experienced " + roleTitle +
+                  " to join our dedicated clinical team.\n\n" +
+                  "KEY RESPONSIBILITIES\n- Deliver high-quality patient care\n" +
+                  "- Collaborate with multidisciplinary teams\n" +
+                  "- Maintain accurate clinical records\n\n" +
+                  "ESSENTIAL REQUIREMENTS\n- Relevant professional qualification\n" +
+                  "- Current registration with applicable regulatory body\n" +
+                  "- " + (string.IsNullOrWhiteSpace(requirements) ? "Relevant clinical experience" : requirements) + "\n\n" +
+                  "HOW TO APPLY\nPlease submit your CV and cover letter to careers@portmoremedical.com";
+    }
+
+    // -----------------------------------------------------------------------
+    // 49. Clinical Incident Report Writer (Admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Converts a free-text description of a clinical incident into a formal,
+    /// structured incident report document suitable for governance review.
+    /// </summary>
+    /// <param name="incidentDescription">Free-text description of what occurred.</param>
+    /// <param name="incidentDate">Date the incident occurred.</param>
+    /// <param name="location">Location within the clinic where the incident occurred.</param>
+    /// <returns>Formal plain-text clinical incident report.</returns>
+    public static string GetIncidentReport(string incidentDescription, string incidentDate, string location)
+    {
+        string prompt =
+            "You are a clinical governance officer at Portmore Medical Center.\n\n" +
+            "Convert the following incident description into a formal clinical incident report:\n\n" +
+            "Incident description: " + incidentDescription + "\n" +
+            "Date of incident: " + (string.IsNullOrWhiteSpace(incidentDate) ? "Not specified" : incidentDate) + "\n" +
+            "Location: " + (string.IsNullOrWhiteSpace(location) ? "Not specified" : location) + "\n\n" +
+            "Format as a formal clinical incident report with these sections:\n" +
+            "CLINICAL INCIDENT REPORT\n" +
+            "Reference: PMC-IR-[generate a plausible reference number]\n" +
+            "Date of Incident:\n" +
+            "Location:\n" +
+            "INCIDENT DESCRIPTION: (formalise the description in professional clinical language)\n" +
+            "IMMEDIATE ACTIONS TAKEN: (suggest what appropriate immediate actions would be)\n" +
+            "CONTRIBUTING FACTORS: (identify any likely contributing factors)\n" +
+            "RISK LEVEL: (Low / Medium / High — with brief justification)\n" +
+            "RECOMMENDATIONS: (3-4 recommendations to prevent recurrence)\n" +
+            "Report prepared by: Portmore Medical Center Governance Team\n\n" +
+            "Formal, objective, professional tone. Plain text only.";
+
+        return CallGpt(prompt, temp: 0.2, maxTokens: 500)
+               ?? "CLINICAL INCIDENT REPORT\n\n" +
+                  "Date of Incident: " + (string.IsNullOrWhiteSpace(incidentDate) ? "Not specified" : incidentDate) + "\n" +
+                  "Location: " + (string.IsNullOrWhiteSpace(location) ? "Not specified" : location) + "\n\n" +
+                  "INCIDENT DESCRIPTION\n" + incidentDescription + "\n\n" +
+                  "IMMEDIATE ACTIONS TAKEN\nImmediate actions were taken in accordance with clinical protocol.\n\n" +
+                  "RECOMMENDATIONS\nThis incident has been logged for governance review.\n\n" +
+                  "Report prepared by: Portmore Medical Center Governance Team";
+    }
+
+    // -----------------------------------------------------------------------
+    // 50. Patient DNA (Did Not Attend) Letter Generator (Admin)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates a professional, compassionate Did Not Attend (DNA) letter for a patient
+    /// who missed their appointment without prior cancellation. The letter encourages
+    /// rebooking while following up on patient wellbeing.
+    /// </summary>
+    /// <param name="patientName">Full name of the patient.</param>
+    /// <param name="service">The service the patient missed.</param>
+    /// <param name="appointmentDate">Date of the missed appointment.</param>
+    /// <param name="timeSlot">Time slot of the missed appointment.</param>
+    /// <returns>Formal plain-text DNA letter ready to post or email.</returns>
+    public static string GetDnaLetter(string patientName, string service,
+        string appointmentDate, string timeSlot)
+    {
+        string prompt =
+            "You are a patient services coordinator at Portmore Medical Center.\n\n" +
+            "Write a professional, compassionate Did Not Attend (DNA) letter for:\n" +
+            "Patient name: " + patientName + "\n" +
+            "Service: " + service + "\n" +
+            "Missed appointment date: " + appointmentDate + "\n" +
+            "Time slot: " + timeSlot + "\n\n" +
+            "The letter should:\n" +
+            "1. Be addressed formally to the patient\n" +
+            "2. Note that they missed their appointment without prior cancellation\n" +
+            "3. Express concern for their wellbeing (not blame)\n" +
+            "4. Encourage them to rebook as soon as possible\n" +
+            "5. Remind them of the cancellation policy (24 hours notice appreciated)\n" +
+            "6. Provide contact details: appointments@portmoremedical.com | +1 (876) 555-0100\n" +
+            "7. Close warmly, signed from 'Patient Services, Portmore Medical Center'\n\n" +
+            "Professional but compassionate tone. Plain text only. Under 250 words.";
+
+        return CallGpt(prompt, temp: 0.4, maxTokens: 350)
+               ?? "Dear " + patientName + ",\n\n" +
+                  "We are writing to inform you that you did not attend your scheduled " + service +
+                  " appointment on " + appointmentDate + " at " + timeSlot + ".\n\n" +
+                  "We understand that circumstances can prevent attendance and hope that you are well. " +
+                  "However, as we were unable to offer your slot to another patient, we kindly ask that " +
+                  "you contact us to rebook your appointment at your earliest convenience.\n\n" +
+                  "Where possible, please give us at least 24 hours notice if you are unable to attend " +
+                  "a future appointment.\n\n" +
+                  "To rebook, please contact us at appointments@portmoremedical.com or call " +
+                  "+1 (876) 555-0100.\n\n" +
+                  "Kind regards,\nPatient Services\nPortmore Medical Center";
+    }
 }

@@ -1,6 +1,6 @@
 # Portmore Medical Center — ASP.NET Web Application
 
-A full-featured medical clinic web application built with **ASP.NET Web Forms (.NET 4.5)** and **SQL Server LocalDB**, enhanced with **40 GPT-4–powered AI features** across patient-facing and admin workflows.
+A full-featured medical clinic web application built with **ASP.NET Web Forms (.NET 4.5)** and **SQL Server LocalDB**, enhanced with **50 GPT-4–powered AI features** across patient-facing and admin workflows.
 
 ---
 
@@ -532,6 +532,17 @@ Admin provides a meeting title, attendees, discussion topics (one per line), and
 | `InsuranceEstimator.aspx` | Public | AI insurance coverage guide & cost estimator |
 | `DoctorAvailability.aspx` | Public | Doctor roster by specialty with AI focus summaries |
 | `AppointmentFeedback.aspx` | Public | Post-appointment star rating with AI sentiment analysis |
+| `EmergencyTriage.aspx` | Public | 4-level emergency symptom triage |
+| `MedicalHistory.aspx` | Public | Medical history summariser |
+| `MentalHealthCheckIn.aspx` | Public | Mental health check-in (5 scores + AI analysis) |
+| `HealthGoalPlanner.aspx` | Public | 4-week health goal action planner |
+| `SecondOpinionPrompts.aspx` | Public | Second opinion question generator from a diagnosis |
+| `RecoveryTracker.aspx` | Public | Post-procedure recovery log and AI trend analysis |
+| `AppointmentEmailPreview.aspx` | Public | AI-drafted personalised appointment confirmation email |
+| `AllergyFoodGuide.aspx` | Public | Personalised allergy & food safety guide |
+| `PreSurgerySupport.aspx` | Public | Pre-surgery anxiety support and preparation guide |
+| `SpecialistComparison.aspx` | Public | Plain-English comparison of two medical specialties |
+| `HealthAgeCalculator.aspx` | Public | Lifestyle-based health age estimate with improvement tips |
 | `SignUp.aspx` | Public | Patient registration |
 | `SignIn2.aspx` | Public | Patient login |
 | `AdminView.aspx` | Admin | Full dashboard: all grids + all admin AI panels |
@@ -599,6 +610,100 @@ All AI calls are centralised in `App_Code/OpenAIService.cs`. Every public method
 | `GetTrainingRecommendations()` | Top 5 staff training priorities from complaint/feedback data | `string` |
 | `GetSocialMediaPost()` | Platform-specific health awareness social post | `string` |
 | `GetMeetingAgenda()` | Structured clinical meeting agenda | `string` |
+| `GetConfirmationEmailDraft()` | Personalised appointment confirmation email draft | `string` |
+| `GetAllergyFoodGuide()` | Personalised food safety guide for listed allergies | `string` |
+| `GetPreSurgerySupport()` | Compassionate pre-operative anxiety support guide | `string` |
+| `GetSpecialistComparison()` | Plain-English comparison of two specialties | `string` |
+| `GetHealthAge()` | Lifestyle-based health age estimate with improvement tips | `string` |
+| `GetDischargeSummary()` | Formal patient discharge summary document | `string` |
+| `GetPressRelease()` | Professional press release for clinic announcements | `string` |
+| `GetJobDescription()` | Full healthcare job description in NHS style | `string` |
+| `GetIncidentReport()` | Formal clinical incident report from free-text description | `string` |
+| `GetDnaLetter()` | Compassionate DNA (Did Not Attend) letter | `string` |
+
+---
+
+## AI Features — New Patient Pages (41–45)
+
+### 41. Appointment Confirmation Email Preview
+**Page:** `AppointmentEmailPreview.aspx`
+**Method:** `OpenAIService.GetConfirmationEmailDraft()`
+
+Patient enters their name, appointment date, service, and time slot. GPT-4 drafts a warm personalised confirmation email with preparation tips specific to the booked specialty. A **Copy** button copies the text to clipboard for easy use.
+
+---
+
+### 42. AI Allergy & Food Safety Guide
+**Page:** `AllergyFoodGuide.aspx`
+**Method:** `OpenAIService.GetAllergyFoodGuide()`
+
+Patient lists their allergies and GPT-4 generates a structured food safety guide covering: foods to avoid, safe food swaps, label-reading tips, and eating-out advice. Always closes with a reminder to carry prescribed emergency medication and consult a dietitian.
+
+---
+
+### 43. Pre-Surgery Anxiety Support
+**Page:** `PreSurgerySupport.aspx`
+**Method:** `OpenAIService.GetPreSurgerySupport()`
+
+Patient selects their procedure type and optionally describes their concerns. GPT-4 provides a compassionate, evidence-based support guide covering: what to expect, anxiety management techniques (breathing, visualisation), practical preparation steps, and what to expect on the day. Always signposts the clinical team for medical questions.
+
+---
+
+### 44. Specialist Comparison Tool
+**Page:** `SpecialistComparison.aspx`
+**Method:** `OpenAIService.GetSpecialistComparison()`
+
+Patient selects two specialties from a dropdown. GPT-4 explains what each specialty does, when to see each, the key difference between them, and neutral guidance on how to decide. A **Book an Appointment** quick-link is shown below the result.
+
+---
+
+### 45. Health Age Calculator
+**Page:** `HealthAgeCalculator.aspx`
+**Method:** `OpenAIService.GetHealthAge()`
+
+Patient fills in six lifestyle indicators: actual age, smoking status, exercise frequency, diet quality, sleep hours, and stress level. GPT-4 estimates a "health age" (which may be higher or lower than actual age), explains which factors influenced it, acknowledges positive habits, and suggests the top 3 improvements. Always includes a disclaimer that this is educational, not a clinical assessment. A quick-link to the Health Goal Planner is shown below the result.
+
+---
+
+## AI Features — New Admin Panels (46–50)
+
+### 46. Patient Discharge Summary Generator
+**Location:** `AdminView.aspx` — Clinical Documents section
+**Method:** `OpenAIService.GetDischargeSummary()`
+
+Admin enters patient name, diagnosis, treatment provided, discharge medications, and follow-up instructions. GPT-4 formats a formal discharge summary document with all standard sections. Includes a **Print** button.
+
+---
+
+### 47. AI Press Release Generator
+**Location:** `AdminView.aspx` — Clinical Documents section
+**Method:** `OpenAIService.GetPressRelease()`
+
+Admin enters a news topic (e.g. "New MRI scanner installed") and optional key points. GPT-4 writes a full professional press release with FOR IMMEDIATE RELEASE header, headline, dateline, body paragraphs, a director quote, clinic boilerplate, and contact details.
+
+---
+
+### 48. Job Description Generator
+**Location:** `AdminView.aspx` — Clinical Documents section
+**Method:** `OpenAIService.GetJobDescription()`
+
+Admin enters a job title, department, and optional key requirements. GPT-4 generates a complete healthcare job description in NHS/professional style with: Job Summary, Key Responsibilities, Essential & Desirable Requirements, What We Offer, and How to Apply sections. Includes a **Print** button.
+
+---
+
+### 49. Clinical Incident Report Writer
+**Location:** `AdminView.aspx` — Clinical Documents section
+**Method:** `OpenAIService.GetIncidentReport()`
+
+Admin describes an incident in free text and optionally provides a date and location. GPT-4 converts the description into a formal clinical incident report with: Reference number, Incident Description (formalised), Immediate Actions, Contributing Factors, Risk Level, and Recommendations. Includes a **Print** button.
+
+---
+
+### 50. Patient DNA (Did Not Attend) Letter
+**Location:** `AdminView.aspx` — Clinical Documents section
+**Method:** `OpenAIService.GetDnaLetter()`
+
+Admin selects the patient name, service missed, appointment date, and time slot. GPT-4 generates a professional, compassionate DNA letter that expresses concern for the patient's wellbeing (not blame), encourages rebooking, reminds them of the cancellation policy, and provides contact details. Includes a **Print** button.
 
 ---
 
