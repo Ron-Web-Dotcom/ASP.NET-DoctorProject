@@ -17,6 +17,7 @@ A full-featured medical clinic web application built with **ASP.NET Web Forms (.
 9. [All Pages Reference](#all-pages-reference)
 10. [OpenAI Service Methods](#openai-service-methods)
 11. [Database Schema](#database-schema)
+12. [Feature Showcase — Sample Inputs & Outputs](#feature-showcase--sample-inputs--outputs)
 
 ---
 
@@ -746,6 +747,1226 @@ CREATE TABLE [Contacts] (
     Sentiment       NVARCHAR(20),
     SentimentReason NVARCHAR(500)
 );
+```
+
+---
+
+*Portmore Medical Center — ASP.NET Doctor Project*
+*Built with ASP.NET Web Forms, SQL Server LocalDB, Bootstrap 3, and OpenAI GPT-4*
+
+---
+
+## Feature Showcase — Sample Inputs & Outputs
+
+Each entry below shows a realistic example of what a user types in and what GPT-4 returns on screen. All AI output is HTML-encoded before rendering. When no API key is configured every method falls back gracefully to a hardcoded string.
+
+---
+
+### 1. AI Triage — auto-assigned on every booking
+**Page:** `AppointmentForm.aspx`
+
+**Input:**
+```
+Name: Maria Brown | Age: 58 | Service: Cardiology
+Reason: Chest pain and shortness of breath for 3 days
+```
+**Output (stored in DB, colour-coded in admin grid):**
+```
+AITriage : Urgent
+AINote   : Patient presents with chest pain and shortness of breath lasting
+           3 days, which may indicate acute coronary syndrome or pulmonary
+           pathology. Recommend immediate ECG and troponin levels on arrival.
+           Prioritise for first available cardiologist slot.
+```
+Badge: 🔴 Urgent
+
+---
+
+### 2. Symptom Checker
+**Page:** `SymptomChecker.aspx`
+
+**Input:**
+```
+Sharp pain behind my right eye, sensitivity to light, and nausea for two days
+```
+**Output:**
+```
+Recommended Specialist: Opticology / Neurology
+
+Reason: The combination of sharp retro-orbital pain, photosensitivity, and
+nausea may indicate ocular migraine, increased intraocular pressure, or a
+neurological concern. An Opticology specialist can rule out eye-related causes;
+a neurological assessment is also advised if symptoms persist.
+```
+
+---
+
+### 3. Appointment Rescheduler
+**Page:** `CancelAppointment.aspx`
+
+**Input:**
+```
+Name: James Clarke | Service: Gynaecology | Reason: Work conflict
+```
+**Output:**
+```
+Hi James, we completely understand that life gets busy and plans change. Your
+Gynaecology appointment has been noted for cancellation. We encourage you to
+rebook at your earliest convenience — your health is important and our team is
+here whenever you're ready. Simply visit our booking page or call us to find a
+new time that works. We look forward to seeing you soon!
+```
+
+---
+
+### 4. Multi-Language Support
+**Navbar → Language dropdown → Spanish**
+
+**Original:** `Welcome to Portmore Medical Center. Book an appointment today.`
+
+**Output:**
+```
+Bienvenido al Centro Médico Portmore. Reserve una cita con nuestro equipo hoy.
+```
+
+---
+
+### 5. Medication Interaction Checker
+**Page:** `MedicationChecker.aspx`
+
+**Input:**
+```
+Warfarin, Aspirin, Ibuprofen, Metformin
+```
+**Output:**
+```
+IMPORTANT: This is general educational information only and does not replace
+advice from your doctor or pharmacist.
+
+INTERACTIONS FOUND
+• Warfarin + Aspirin: Both thin the blood. Combining them significantly increases
+  the risk of internal bleeding and requires close medical supervision.
+• Warfarin + Ibuprofen: NSAIDs raise Warfarin's blood-thinning effect and
+  irritate the stomach lining, increasing bleeding risk.
+
+MONITORING NOTES
+• Warfarin requires regular INR blood tests. Vitamin K-rich foods (spinach,
+  broccoli) can affect how well it works.
+• Metformin should be paused before contrast dye procedures (e.g. CT scans).
+
+Please bring this list to your appointment and discuss with your doctor.
+```
+
+---
+
+### 6. Symptom Diary Analyser
+**Page:** `SymptomDiary.aspx` — after adding 3+ entries and clicking Analyse.
+
+**Entries:**
+```
+Mon 10 Mar: Mild lower back pain, 4/10
+Tue 11 Mar: Pain worsened to 6/10, stiff on waking
+Wed 12 Mar: 7/10, radiating to left leg, difficulty walking
+```
+**Output:**
+```
+TREND SUMMARY
+Your diary shows a clear worsening trend. Pain has escalated from mild (4/10)
+to severe (7/10) with new radiation to the left leg — a pattern that may
+suggest nerve involvement or disc-related pathology.
+
+RECOMMENDATION: See your GP soon — the progression and new leg symptoms
+warrant prompt assessment.
+```
+
+---
+
+### 7. Smart Time Slot Recommender
+**Page:** `AppointmentForm.aspx` — "Suggest Best Time for Me" button.
+
+**Input:** `Service: Radiology | Reason: Scheduled MRI follow-up`
+
+**Output:**
+```
+For a Radiology MRI appointment, a morning slot (8am–10am) is ideal. Scanners
+are freshest and less likely to be running behind schedule. An early slot also
+means you can fast overnight if required and have results reviewed the same
+afternoon.
+```
+
+---
+
+### 8. AI Readiness Checklist
+**Page:** `AppointmentForm.aspx` — confirmation panel, auto-generated.
+
+**Service booked:** Radiology (MRI)
+
+**Output:**
+```
+• Fast for at least 4 hours before your MRI (unless advised otherwise).
+• Remove all metal jewellery, piercings, and hair clips before arrival.
+• Inform staff of any metal implants, pacemakers, or surgical clips.
+• Bring your referral letter and any previous scan images or reports.
+• Wear comfortable, loose-fitting clothing with no metal fastenings.
+• Arrive 15 minutes early to complete a safety screening questionnaire.
+```
+
+---
+
+### 9. Patient Education Card
+**Page:** `AppointmentForm.aspx` — confirmation panel, auto-generated.
+
+**Service booked:** Cardiology
+
+**Output:**
+```
+Cardiology focuses on the heart and circulatory system, diagnosing and treating
+conditions such as heart disease, high blood pressure, arrhythmias, and heart
+failure.
+
+During your appointment your doctor will typically review your medical history,
+listen to your heart, check your blood pressure, and may order an ECG or blood
+tests. Some visits include an echocardiogram — an ultrasound of the heart.
+
+To get the most from your visit, write down any symptoms you've noticed (including
+when they occur), bring a full medication list, and don't hesitate to ask
+questions — no question is too small when it comes to your heart health.
+```
+
+---
+
+### 10. Duplicate Booking Detector
+**Page:** `AppointmentForm.aspx` — yellow warning shown before submission.
+
+**Output:**
+```
+⚠️ A booking for Maria Brown — Cardiology already exists in our system.
+   If this is intentional (e.g. a follow-up), you may still proceed.
+```
+
+---
+
+### 11. Triage Escalation Alert
+**Page:** `AdminView.aspx` — auto-shown at top of page.
+
+**Condition:** 4 Urgent appointments in DB.
+
+**Output (red banner):**
+```
+⚠️ ALERT: 4 appointments are currently classified as URGENT.
+   Immediate clinical review recommended. See the Appointments grid below.
+```
+
+---
+
+### 12. Sentiment Analysis on Contact Messages
+**Page:** `ContactForm.aspx` — runs automatically on every submission.
+
+**Patient message:**
+```
+I have been waiting 6 weeks for my cardiology referral and nobody has called me.
+I am very worried and feel completely ignored.
+```
+**Output (stored in DB, orange badge in admin grid):**
+```
+Sentiment: Distressed
+Reason   : Patient is expressing significant anxiety and frustration over a
+           delayed referral, suggesting unmet care needs requiring prompt
+           follow-up.
+```
+
+---
+
+### 13. No-Show Risk Predictor
+**Triggered automatically on every booking.**
+
+**Service:** Cardiology | **Slot:** 4:00 PM – 5:00 PM
+
+**Output (stored in DB):**
+```
+NoShowRisk: High
+```
+Badge: 🟠 Orange — admin can proactively send a reminder.
+
+---
+
+### 14. AI Follow-Up Email Drafter
+**Page:** `AdminView.aspx`
+
+**Input:**
+```
+Patient: Maria | Service: Cardiology
+Note: ECG normal, follow-up bloods requested
+```
+**Output:**
+```
+Dear Maria,
+
+Thank you for attending your Cardiology appointment at Portmore Medical Center.
+We hope you are feeling a little more reassured following your visit.
+
+Your ECG results were within normal limits, which is encouraging. As discussed,
+we have requested follow-up blood tests to give us a more complete picture. Our
+team will be in touch once the results are available.
+
+In the meantime, please contact us if your symptoms change or worsen.
+
+Warm regards,
+Portmore Medical Center Patient Care Team
+```
+
+---
+
+### 15. Doctor's Note Simplifier
+**Page:** `AdminView.aspx`
+
+**Input (clinical):**
+```
+Acute exacerbation of COPD secondary to suspected viral URTI. SpO2 94% on
+room air. Administered nebulised salbutamol 2.5mg and oral prednisolone 30mg.
+Recommend outpatient follow-up within 72 hours.
+```
+**Output (plain English):**
+```
+Your breathing condition (COPD) has flared up, likely triggered by a viral
+chest infection. Your oxygen levels were slightly lower than normal on arrival.
+You were given a breathing treatment through a mask (salbutamol nebuliser) and
+steroid tablets (prednisolone) to reduce the inflammation in your airways.
+Please come back within 3 days for a check-up.
+```
+
+---
+
+### 16. AI Dashboard Insights
+**Page:** `AdminView.aspx` — Refresh button.
+
+**Output:**
+```
+Cardiology is your busiest service with 18 bookings this week, followed by
+General Practice (14) and Gynaecology (9). You have 4 Urgent-triage appointments
+outstanding — recommend reviewing these for immediate scheduling priority.
+No-show risk is elevated in the 4–5pm slots across all services; consider
+automated reminders for that time band. Booking volume is up 12% on last month.
+```
+
+---
+
+### 17. Weekly Demand Forecast
+**Page:** `AdminView.aspx`
+
+**Output:**
+```
+Cardiology and General Practice are forecast to be the highest-demand services
+next week, with Cardiology showing a 20% uplift on the prior week. Tuesday and
+Wednesday mornings are projected to be peak periods. Consider an additional
+Cardiology slot on those days and strengthen front-desk staffing for 8–11am.
+Radiology demand appears stable.
+```
+
+---
+
+### 18. AI Referral Letter Drafter
+**Page:** `AdminView.aspx`
+
+**Input:**
+```
+Patient: James Turner | Referring: Dr. Anne Reid | From: General Practice
+To: Cardiology | Reason: Persistent palpitations, family history of arrhythmia
+```
+**Output:**
+```
+Portmore Medical Center
+16 March 2026
+
+Dear Cardiology Colleague,
+
+RE: Referral — Mr. James Turner
+
+I write to refer Mr. James Turner for specialist assessment. He presents with
+a 6-week history of persistent palpitations and a paternal family history of
+atrial fibrillation. An initial ECG was inconclusive. I would be grateful for
+your assessment and consideration of Holter monitoring and echocardiography.
+
+Yours sincerely,
+Dr. Anne Reid, General Practitioner, Portmore Medical Center
+```
+
+---
+
+### 19. Complaint Escalation Handler
+**Page:** `AdminView.aspx`
+
+**Input:**
+```
+I waited 2 hours past my appointment time with no explanation. Staff were
+dismissive when I asked how long it would be.
+```
+**Output:**
+```
+Dear Patient,
+
+Thank you for contacting us. Please accept our sincere apologies for the
+experience you had during your recent visit.
+
+We are sorry you waited significantly beyond your scheduled time without a
+clear explanation. Your concern has been escalated to our Patient Experience
+Manager, who will review the circumstances and follow up with you within
+3 working days.
+
+We value you as a patient and are committed to making this right.
+
+Kind regards,
+Patient Experience Team, Portmore Medical Center
+```
+
+---
+
+### 20. Monthly Newsletter Generator
+**Page:** `AdminView.aspx`
+
+**Output (top services: Cardiology, General Practice, Radiology):**
+```
+Dear Portmore Medical Center Patients,
+
+Happy March! Cardiology and General Practice have been our most in-demand
+services this month — a reminder of how important routine heart health checks
+are. If you've been putting off a cardiovascular review, now is the time.
+
+Our Radiology team has also been busy supporting many diagnostic needs this
+month. Remember: slots fill up quickly. Book early to secure your preferred time.
+
+Wishing you a healthy and happy month ahead.
+
+The Portmore Medical Center Team
+```
+
+---
+
+### 21. Patient Appointment Dashboard
+**Page:** `MyAppointments.aspx` — after signing in.
+
+**Dashboard table (sample row):**
+```
+Service    | Time Slot         | Triage    | No-Show Risk
+-----------|-------------------|-----------|-------------
+Cardiology | 9:00 AM–10:00 AM  | 🔴 Urgent | 🟠 High
+```
+
+**Click "Get AI Tip" on that row:**
+```
+For a morning Cardiology appointment, avoid caffeine and heavy meals from
+the evening before. Bring any previous ECG or test results you have at home.
+Arriving 10 minutes early allows time for a resting blood pressure check
+before you see the doctor.
+```
+
+---
+
+### 22. AI Diet & Lifestyle Planner
+**Page:** `LifestylePlanner.aspx`
+
+**Input:** `Specialty: Cardiology | Age: 55 | Conditions: High blood pressure`
+
+**Output:**
+```
+1. DIET RECOMMENDATIONS
+• Follow a DASH or Mediterranean diet — vegetables, fruits, whole grains, lean protein.
+• Reduce sodium to under 2,300mg per day; avoid processed foods and takeaways.
+• Increase potassium-rich foods: bananas, spinach, sweet potato.
+• Choose olive oil over butter; limit saturated fat.
+
+2. EXERCISE & ACTIVITY
+• 30 minutes brisk walking, 5 days a week — low impact, heart-healthy.
+• Try swimming or cycling as alternatives.
+• Always warm up before exercise.
+
+3. LIFESTYLE TIPS
+• Monitor blood pressure at home and log readings to share with your doctor.
+• Prioritise 7–8 hours sleep — poor sleep raises blood pressure.
+• Practice daily stress management: deep breathing, yoga, or mindfulness.
+
+Always follow your doctor's personalised advice above all other guidance.
+```
+
+---
+
+### 23. AI Insurance & Cost Estimator
+**Page:** `InsuranceEstimator.aspx`
+
+**Input:** `Service: Cardiology | Insurance: Private Health Insurance`
+
+**Output:**
+```
+1. WHAT IS TYPICALLY COVERED
+• Initial specialist consultation — usually covered subject to excess.
+• Diagnostic tests (ECG, echocardiogram) may require pre-authorisation.
+• Emergency cardiac hospital admissions typically covered.
+
+2. QUESTIONS TO ASK YOUR INSURER
+- Is Cardiology included under my specialist cover?
+- What is my excess or co-payment for a consultant appointment?
+- Do I need a GP referral before I can claim?
+- Are diagnostic tests covered under the same claim?
+- What is my annual cardiac benefit limit?
+
+3. COST GUIDANCE
+Costs vary widely by plan tier and depend on whether diagnostics are included
+in the same session. Complex procedures are subject to your benefit schedule.
+
+This is general guidance only. Contact your insurer and our billing team for
+exact details.
+```
+
+---
+
+### 24. Doctor Availability Viewer
+**Page:** `DoctorAvailability.aspx` — select Cardiology.
+
+**Output (doctor card):**
+```
+Dr. Michael Knapton — Cardiology
+Available slots: [8am–9am]  [11am–12pm]  [2pm–3pm]
+
+Dr. Knapton specialises in interventional cardiology and heart failure management
+at Portmore Medical Center, bringing a patient-centred approach to complex cardiac
+conditions.
+                                        [Book with this Doctor]
+```
+
+---
+
+### 25. Post-Appointment Feedback
+**Page:** `AppointmentFeedback.aspx`
+
+**Input:** `Rating: ⭐⭐⭐⭐⭐ | Service: Cardiology | Comment: "Dr. Knapton was brilliant — very reassuring."`
+
+**Output (thank-you screen):**
+```
+✅ Thank you for your feedback!
+
+Sentiment: 🟢 POSITIVE
+"Patient expressed high satisfaction with clinical care and doctor communication."
+```
+
+---
+
+### 26. Emergency Symptom Triage
+**Page:** `EmergencyTriage.aspx`
+
+**Input:**
+```
+Sudden severe chest pain radiating to my left arm, sweating heavily, feeling
+sick and dizzy. Started 20 minutes ago.
+```
+**Output:**
+```
+┌─────────────────────────────────────┐
+│  🔴  EMERGENCY                      │
+└─────────────────────────────────────┘
+
+Level: EMERGENCY
+Reason: These are classic warning signs of a myocardial infarction (heart
+attack). This is a time-critical medical emergency.
+Action: Call 999 immediately or go to A&E right now. Do not drive yourself.
+Chew an aspirin (300mg) if available and not allergic.
+
+If symptoms worsen, seek immediate medical attention.
+```
+
+---
+
+### 27. Medical History Summariser
+**Page:** `MedicalHistory.aspx`
+
+**Input:**
+```
+Conditions : Type 2 Diabetes, Hypertension
+Medications: Metformin 500mg BD, Amlodipine 5mg OD
+Allergies  : Penicillin (rash)
+Surgeries  : Appendectomy 2008
+Family Hx  : Father — MI age 62
+```
+**Output:**
+```
+MEDICAL HISTORY SUMMARY
+
+ACTIVE CONDITIONS
+• Type 2 Diabetes Mellitus — under medical management
+• Hypertension — under medical management
+
+CURRENT MEDICATIONS
+• Metformin 500mg — twice daily
+• Amlodipine 5mg — once daily
+
+KNOWN ALLERGIES
+• Penicillin — reaction: rash (document as drug allergy)
+
+SURGICAL HISTORY
+• Appendectomy (2008) — uncomplicated
+
+FAMILY HISTORY
+• Paternal: Myocardial infarction at age 62 — elevated cardiovascular risk
+
+CLINICAL NOTE
+Given the family history of premature MI and current cardiovascular risk factors,
+routine cardiovascular screening and HbA1c monitoring are recommended.
+```
+
+---
+
+### 28. Mental Health Check-In
+**Page:** `MentalHealthCheckIn.aspx`
+
+**Input:** `Mood: 2 | Sleep: 2 | Anxiety: 2 | Energy: 2 | Social: 1 | Notes: "Feeling isolated since losing my job."`
+
+**Output:**
+```
+1. WELLBEING SUMMARY
+Thank you for checking in honestly. Your scores suggest you're going through a
+particularly difficult time — low mood, disrupted sleep, and feelings of isolation
+are a completely understandable response to job loss.
+
+2. SUGGESTED SUPPORT
+• Build a simple daily routine: consistent wake and sleep times stabilise mood.
+• Reach out — even a short call or text to someone you trust can make a real difference.
+• Gentle movement: a 20-minute daily walk in natural light improves mood and energy.
+• Limit news and social media scrolling, which can amplify anxiety.
+
+3. WHEN TO SEEK HELP
+If you have felt this way for more than two weeks, or you are having thoughts of
+harming yourself, please speak to your GP as soon as possible.
+Samaritans: 116 123 (free, 24/7).
+```
+
+---
+
+### 29. Health Goal Planner
+**Page:** `HealthGoalPlanner.aspx`
+
+**Input:** `Goal: Lower blood pressure, lose 8kg | Activity: 2–3x/week | Conditions: Hypertension`
+
+**Output:**
+```
+WEEK 1 — Foundation
+• Replace one processed meal per day with a home-cooked option (less salt).
+• Begin 20-minute brisk walks, 3 times this week.
+• Download a BP app and take morning readings.
+
+WEEK 2 — Building
+• Extend walks to 30 minutes, 4 times per week.
+• Reduce takeaways to once this week; add two extra vegetable portions daily.
+
+WEEK 3 — Progress
+• Introduce a second form of exercise — try swimming or cycling.
+• Review your BP log and note any downward trend.
+
+WEEK 4 — Consolidate
+• Maintain the exercise habit. Set a 3-month weight goal.
+• Book a GP follow-up to review blood pressure readings.
+
+TIPS FOR SUCCESS
+• Tell someone your goal — accountability doubles your success rate.
+• Celebrate small wins — each healthy meal and walk is progress.
+
+Always consult your doctor before making significant changes to your health routine.
+```
+
+---
+
+### 30. Second Opinion Question Generator
+**Page:** `SecondOpinionPrompts.aspx`
+
+**Input:** `I've been told I need a total knee replacement for severe osteoarthritis.`
+
+**Output:**
+```
+UNDERSTANDING THE DIAGNOSIS
+1. How severe is my arthritis compared to others who have had this surgery?
+2. Can I see the imaging that shows why replacement is now necessary?
+3. What are the long-term risks if I delay or decline the surgery?
+
+TREATMENT OPTIONS
+4. Are there non-surgical options we haven't tried — injections, specialist physio?
+5. What type of implant would be used, and how long is it expected to last?
+6. What does recovery look like — how long until I can walk normally?
+7. What are the risks of complications such as infection or implant failure?
+
+NEXT STEPS & LIFESTYLE
+8. What can I do before surgery to improve my outcome (strength, weight loss)?
+9. Would you recommend I seek a second orthopaedic opinion before proceeding?
+```
+
+---
+
+### 31. Post-Treatment Recovery Tracker
+**Page:** `RecoveryTracker.aspx`
+
+**Entries:** Knee replacement, 4 daily logs.
+```
+Day 1: Pain 8/10, bed rest
+Day 3: Pain 6/10, walking with crutches
+Day 5: Pain 5/10, walking unaided to bathroom
+Day 7: Pain 3/10, 10-min physio exercises completed
+```
+**Output:**
+```
+RECOVERY TREND
+Clear and encouraging improvement. Pain has reduced from severe (8/10) to mild
+(3/10). Early mobilisation and physio engagement are both positive indicators.
+
+POSITIVE SIGNS : Consistent pain reduction; early mobilisation achieved.
+AREAS TO WATCH : Monitor swelling — contact team if it increases or becomes hot/red.
+
+RECOMMENDATION: ✅ Recovery appears on track
+```
+
+---
+
+### 32. Appointment Confirmation Email Preview
+**Page:** `AppointmentEmailPreview.aspx`
+
+**Input:** `Name: David Thompson | Service: Cardiology | Date: 25 Mar 2026 | Time: 9:00 AM`
+
+**Output (copyable draft):**
+```
+Dear David,
+
+We are delighted to confirm your upcoming appointment at Portmore Medical Center.
+
+Service : Cardiology
+Date    : 25 March 2026
+Time    : 9:00 AM – 10:00 AM
+
+PREPARING FOR YOUR VISIT
+• Avoid caffeine and heavy meals on the morning of your appointment.
+• Bring a list of your current medications and any previous ECG results.
+• Wear comfortable, loose-fitting clothing.
+• Arrive 10 minutes early for a resting blood pressure check.
+
+To reschedule: appointments@portmoremedical.com | +1 (876) 555-0100
+
+We look forward to welcoming you.
+The Portmore Medical Center Team
+```
+
+---
+
+### 33. AI Allergy & Food Safety Guide
+**Page:** `AllergyFoodGuide.aspx`
+
+**Input:** `peanuts, tree nuts, shellfish`
+
+**Output:**
+```
+FOODS TO AVOID
+• Peanuts : peanut butter, satay sauce, many Asian dishes, baked goods,
+  cereal bars. Hidden in: ice cream, sauces, mixed snacks.
+• Tree Nuts: marzipan, nut oils, pesto, many desserts, salad toppings.
+• Shellfish: paella, sushi, some soups. Hidden in: Worcester sauce, seafood crisps.
+
+SAFE FOOD SWAPS
+• Peanut butter  → sunflower seed butter or tahini
+• Prawn crackers → plain rice crackers
+• Mixed nuts     → pumpkin or sunflower seeds (check labels)
+
+LABEL READING TIPS
+• Look for the "Contains:" allergen box — peanuts, tree nuts, and crustaceans
+  must be declared in bold under UK/EU law.
+• Check "May contain traces of nuts" — indicates shared production equipment.
+• Be cautious with "natural flavouring" — it may mask allergens.
+
+EATING OUT SAFELY
+• Always tell your server about all three allergies before ordering.
+• Ask specifically about shared surfaces and shared cooking oil.
+• Avoid buffet-style restaurants where cross-contamination risk is highest.
+
+IMPORTANT REMINDER
+Always carry any prescribed emergency medication (such as an EpiPen) and consult
+your doctor or dietitian for personalised advice.
+```
+
+---
+
+### 34. Pre-Surgery Anxiety Support
+**Page:** `PreSurgerySupport.aspx`
+
+**Input:** `Procedure: Cardiac Surgery | Concern: Terrified of the general anaesthetic`
+
+**Output:**
+```
+WHAT TO EXPECT
+Cardiac surgery is performed by a highly skilled team — surgeon, anaesthetist,
+and specialist nurses — who are with you every moment. You will not feel or
+remember anything during the procedure.
+
+MANAGING ANXIETY
+• Box breathing: inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 times.
+• Visualise yourself recovering well; focus on the positive outcome.
+• Share your specific fear with your anaesthetist — they hear this often and
+  can explain exactly how you'll be monitored throughout.
+• Write worries down; externalising them reduces their power significantly.
+
+PRACTICAL PREPARATION
+• Follow fasting instructions precisely — usually nothing after midnight.
+• Shower with antiseptic wash the night before and morning of surgery.
+• Arrange a trusted person to accompany you and take you home.
+
+ON THE DAY
+• The team will introduce themselves and answer your questions before theatre.
+• A nurse will be present immediately when you wake up to reassure you.
+
+REMEMBER
+Your clinical team is here to support you every step of the way.
+Please ask them any medical questions you have.
+```
+
+---
+
+### 35. Specialist Comparison Tool
+**Page:** `SpecialistComparison.aspx`
+
+**Input:** `Cardiology  vs  General Practitioner`
+
+**Output:**
+```
+CARDIOLOGY — WHAT THEY DO
+A Cardiologist focuses exclusively on the heart and cardiovascular system,
+diagnosing and treating coronary artery disease, heart failure, and arrhythmias.
+
+CARDIOLOGY — WHEN TO SEE THEM
+• Referred by GP following abnormal ECG or echo result.
+• Experiencing chest pain, palpitations, or unexplained breathlessness.
+• Family history of heart disease requiring specialist assessment.
+
+GENERAL PRACTITIONER — WHAT THEY DO
+A GP is your first point of contact for any health concern — they assess,
+diagnose, treat a wide range of conditions, and refer to specialists as needed.
+
+GENERAL PRACTITIONER — WHEN TO SEE THEM
+• You have a new symptom you are unsure about.
+• You need a check-up, blood tests, or repeat prescription.
+• You want a referral to see a Cardiologist or any other specialist.
+
+KEY DIFFERENCE
+A GP is your generalist first-stop; a Cardiologist is a specialist you would
+typically see after GP referral for heart-specific concerns.
+
+RECOMMENDATION
+Start with your GP — they will assess your symptoms and refer to a Cardiologist
+if clinically indicated.
+```
+
+---
+
+### 36. Health Age Calculator
+**Page:** `HealthAgeCalculator.aspx`
+
+**Input:** `Age: 45 | Smoking: Non-smoker | Exercise: 2–3x/week | Diet: Good | Sleep: 6hrs | Stress: High`
+
+**Output:**
+```
+HEALTH AGE ESTIMATE
+Your estimated health age is approximately 48. The two factors pulling your
+health age above your actual age are elevated stress and consistently getting
+only 6 hours of sleep — both have significant cumulative effects on
+cardiovascular health, immune function, and cognitive performance.
+
+TOP 3 IMPROVEMENTS
+1. Sleep — Prioritising 7–8 hours nightly would have the single biggest impact.
+2. Stress — 10 minutes of daily mindfulness or a pre-bed digital detox can
+   reduce cortisol and improve sleep quality simultaneously.
+3. Exercise — increasing to 4–5 sessions per week would meaningfully reduce
+   your cardiovascular risk profile.
+
+POSITIVE HABITS
+You are a non-smoker, maintain a good diet, and already exercise regularly —
+significant positives already working in your favour.
+
+DISCLAIMER
+This is a general wellness estimate for educational purposes only and is not a
+medical assessment. Please speak to your GP for personalised health advice.
+```
+
+---
+
+### 37. Staff Performance Report
+**Page:** `AdminView.aspx`
+
+**Output:**
+```
+STAFF PERFORMANCE REPORT — Portmore Medical Center
+
+1. BUSIEST DEPARTMENTS
+Cardiology leads demand (28%), followed by General Practice (22%) and
+Gynaecology (15%). All three are operating at high utilisation.
+
+2. PATIENT SATISFACTION
+Average feedback rating: 4.2 / 5. Sentiment: 71% Positive, 21% Neutral,
+6% Distressed, 2% Urgent.
+
+3. OPERATIONAL CONCERNS
+• 4 Urgent-triage appointments currently unresolved.
+• No-show rates highest in 4–5pm Cardiology slots (est. 18%).
+• 2 Distressed feedback submissions remain unacknowledged.
+
+4. RECOMMENDATIONS
+• Introduce SMS reminders 48 hours before all appointments.
+• Assign a Patient Liaison to contact Distressed feedback patients within 24hrs.
+• Review Cardiology scheduling capacity to address sustained high demand.
+```
+
+---
+
+### 38. Clinical Audit Report
+**Page:** `AdminView.aspx`
+
+**Output (excerpt):**
+```
+CLINICAL AUDIT REPORT — Portmore Medical Center
+Date: 16 March 2026
+
+EXECUTIVE SUMMARY
+Overall clinical performance is satisfactory with patient satisfaction trending
+positively. Escalation of urgent triage cases and no-show management present
+clear opportunities for process improvement.
+
+KEY FINDINGS
+• 28% of all appointments: Cardiology — the highest of all services.
+• 4 appointments hold Urgent triage classification requiring same-day review.
+• Patient feedback average: 4.2 / 5.
+• Most common complaint theme: waiting times.
+• 8% of contact submissions classified Distressed or Urgent.
+
+RECOMMENDATIONS
+1. Establish a same-day triage review protocol for all Urgent appointments.
+2. Implement automated reminders (SMS/email) 24–48 hours before appointments.
+3. Create a Distressed Patient Pathway with a guaranteed 24-hour response.
+```
+
+---
+
+### 39. Staff Training Topic Recommender
+**Page:** `AdminView.aspx`
+
+**Output:**
+```
+1. PATIENT COMMUNICATION & WAIT TIME MANAGEMENT
+   Why    : Waiting times are the most cited complaint theme.
+   Format : Half-day workshop with role-play scenarios.
+
+2. DISTRESSED PATIENT RESPONSE PROTOCOL
+   Why    : 8% of contact submissions classified Distressed or Urgent.
+   Format : E-learning module + in-person debrief.
+
+3. APPOINTMENT SCHEDULING & NO-SHOW REDUCTION
+   Why    : No-show risk highest in late afternoon slots; no reminder system in place.
+   Format : E-learning with process update guide.
+
+4. CLINICAL TRIAGE AWARENESS FOR FRONT-DESK STAFF
+   Why    : 4 Urgent cases unresolved — gap between AI classification and escalation.
+   Format : Practical workshop with GP facilitator.
+
+5. COMPLAINT HANDLING & DE-ESCALATION
+   Why    : Response time not formalised; multiple submissions unacknowledged.
+   Format : Role-play with Patient Experience Manager.
+```
+
+---
+
+### 40. Social Media Post Generator
+**Page:** `AdminView.aspx`
+
+**Input:** `Topic: World Heart Day | Platform: Instagram`
+
+**Output:**
+```
+❤️ It's World Heart Day — and your heart deserves some love!
+
+Did you know up to 80% of premature heart events are preventable through
+lifestyle changes?
+
+✅ Move for 30 minutes a day
+✅ Eat more vegetables and less salt
+✅ Know your blood pressure numbers
+✅ Never ignore chest pain or palpitations
+
+Book a cardiovascular check with our Cardiology team at Portmore Medical Center.
+Early detection saves lives. 💙
+
+#WorldHeartDay #HeartHealth #PortmoreMedical #HealthyHeart #CardiovascularHealth
+```
+
+---
+
+### 41. Meeting Agenda Generator
+**Page:** `AdminView.aspx`
+
+**Input:** `Title: Monthly Clinical Governance | Date: 28 Mar 2026 | Topics: Triage review, Feedback, Staffing rota`
+
+**Output:**
+```
+PORTMORE MEDICAL CENTER — MEETING AGENDA
+Title     : Monthly Clinical Governance Meeting
+Date      : 28 March 2026
+Attendees : Dr. Clarke (Medical Director), Head Nurse Williams, Admin Manager Brown
+
+1. Welcome & Apologies                              5 min
+2. Triage Escalation Review                        20 min
+   • Current Urgent triage cases
+   • Escalation protocol compliance update
+3. Patient Feedback Analysis                       15 min
+   • Satisfaction score summary (March 2026)
+   • Distressed submission follow-up status
+4. Staffing Rota                                   15 min
+   • April rota sign-off | Easter bank holiday cover
+5. Any Other Business                               5 min
+6. Next Steps & Close                               5 min
+   Next meeting: 25 April 2026
+
+Minutes to be circulated within 48 hours.
+```
+
+---
+
+### 42. Patient Discharge Summary Generator
+**Page:** `AdminView.aspx` — Clinical Documents section.
+
+**Input:**
+```
+Patient  : Maria Brown
+Diagnosis: Hypertensive crisis, resolved
+Treatment: IV labetalol administered. BP stabilised. Monitored 4 hours.
+Meds     : Amlodipine 10mg OD, Ramipril 5mg OD
+Follow-up: GP review in 5 days. Repeat bloods in 2 weeks.
+```
+**Output:**
+```
+PATIENT DISCHARGE SUMMARY
+Reference : PMC-DS-2026-0316 | Date: 16 March 2026
+Patient   : Maria Brown
+
+DIAGNOSIS
+Hypertensive crisis — resolved. Admission BP: 210/120mmHg.
+Discharge BP: 148/88mmHg. No evidence of end-organ damage.
+
+TREATMENT PROVIDED
+IV labetalol administered to achieve blood pressure control. Patient monitored
+for 4 hours post-treatment. Counselled on medication adherence and lifestyle.
+
+DISCHARGE MEDICATIONS
+• Amlodipine 10mg — once daily (dose increased)
+• Ramipril 5mg — once daily (continued)
+
+FOLLOW-UP INSTRUCTIONS
+• GP review within 5 days — bring home BP log if available.
+• Repeat blood tests (U&E, renal function) in 2 weeks.
+• Return to A&E if BP exceeds 180/110mmHg or symptoms recur.
+
+Prepared by: Portmore Medical Center Clinical Team
+```
+
+---
+
+### 43. AI Press Release Generator
+**Page:** `AdminView.aspx` — Clinical Documents section.
+
+**Input:** `Topic: New 3T MRI scanner | Key points: 40% faster scans, from April 2026, £2M investment`
+
+**Output:**
+```
+FOR IMMEDIATE RELEASE
+
+PORTMORE MEDICAL CENTER UNVEILS STATE-OF-THE-ART 3T MRI SCANNER,
+CUTTING PATIENT SCAN TIMES BY 40%
+
+Portmore, Jamaica — 16 March 2026 — Portmore Medical Center today announced the
+operational launch of its new 3T MRI scanner — a £2M investment available from
+April 2026. Scan times are reduced by 40% with superior image quality enabling
+earlier, more precise diagnoses across Neurology, Orthopaedics, and Cardiology.
+
+"This is a landmark moment for our patients," said Dr. James Clarke, Medical
+Director, Portmore Medical Center. "Faster imaging means faster diagnoses and
+better outcomes."
+
+Contact: media@portmoremedical.com | +1 (876) 555-0100
+```
+
+---
+
+### 44. Job Description Generator
+**Page:** `AdminView.aspx` — Clinical Documents section.
+
+**Input:** `Role: Senior Cardiac Nurse Specialist | Dept: Cardiology | Requirements: 5yr cardiac nursing, NMC, ECG competency`
+
+**Output:**
+```
+JOB TITLE  : Senior Cardiac Nurse Specialist
+DEPARTMENT : Cardiology
+REPORTS TO : Lead Cardiologist / Director of Nursing
+
+JOB SUMMARY
+Portmore Medical Center is seeking an experienced Senior Cardiac Nurse Specialist
+to deliver expert care to cardiac patients, support diagnostics, and contribute
+to team development.
+
+KEY RESPONSIBILITIES
+• Deliver evidence-based care for heart failure, arrhythmias, and post-MI patients.
+• Perform and interpret 12-lead ECGs.
+• Educate patients and families on cardiac conditions and medications.
+• Maintain accurate clinical records in line with NMC standards.
+• Mentor junior nursing staff.
+
+ESSENTIAL REQUIREMENTS
+• Registered Nurse (NMC) — active registration required.
+• Minimum 5 years post-qualification experience, 3+ in a cardiac setting.
+• Demonstrable ECG recording and interpretation competency.
+
+HOW TO APPLY
+Submit your CV and cover letter to careers@portmoremedical.com
+```
+
+---
+
+### 45. Clinical Incident Report Writer
+**Page:** `AdminView.aspx` — Clinical Documents section.
+
+**Input:**
+```
+Description: Patient fell from waiting room chair and hit head on floor.
+             Staff responded immediately and administered first aid.
+Date: 15 March 2026 | Location: Cardiology Waiting Room
+```
+**Output:**
+```
+CLINICAL INCIDENT REPORT
+Reference  : PMC-IR-2026-0892
+Date       : 15 March 2026
+Location   : Cardiology Waiting Room, Portmore Medical Center
+
+INCIDENT DESCRIPTION
+A patient sustained a fall from a seated position, resulting in head contact with
+the floor surface. Clinical staff responded promptly and administered first aid.
+
+IMMEDIATE ACTIONS TAKEN
+• First aid assessment performed; neurological observations commenced.
+• Incident reported to senior nurse on duty and formally documented.
+• Waiting room inspected for contributing environmental factors.
+
+CONTRIBUTING FACTORS
+Potential patient instability (faintness/vertigo); chair design and layout
+to be assessed for fall-risk compliance.
+
+RISK LEVEL: MEDIUM
+Justification: Head injury with potential for delayed neurological effects.
+
+RECOMMENDATIONS
+1. Conduct a formal waiting room fall-risk assessment.
+2. Replace standard chairs with armchairs in patient waiting areas.
+3. Implement welfare checks for patients waiting beyond 30 minutes.
+4. Ensure all staff complete falls prevention refresher training annually.
+
+Report prepared by: Portmore Medical Center Governance Team
+```
+
+---
+
+### 46. Patient DNA (Did Not Attend) Letter
+**Page:** `AdminView.aspx` — Clinical Documents section.
+
+**Input:** `Patient: John Smith | Service: Cardiology | Date: 10 Mar 2026 | Time: 9:00 AM`
+
+**Output:**
+```
+Dear Mr. John Smith,
+
+I am writing regarding your Cardiology appointment on 10 March 2026 at 9:00 AM,
+which we note you were unfortunately unable to attend.
+
+We hope you are keeping well. We understand that circumstances sometimes make it
+difficult to attend planned appointments and we are not writing to cause distress.
+
+However, as we were unable to offer your slot to another patient, we kindly
+encourage you to rebook as soon as possible. Your Cardiology review is important
+and we would not want any delay to affect your care.
+
+Where possible, please give us at least 24 hours notice for future cancellations.
+
+To rebook: appointments@portmoremedical.com | +1 (876) 555-0100
+
+Kind regards,
+Patient Services, Portmore Medical Center
+```
+
+---
+
+### 47. Staff Bio Generator
+**Page:** `StaffBioGenerator.aspx`
+
+**Input:** `Name: Dr. Michael Knapton | Specialty: Cardiology | Qualifications: MBBS, MD, FRCP | Years: 22`
+
+**Output:**
+```
+Dr. Michael Knapton is a highly experienced Consultant Cardiologist at Portmore
+Medical Center, bringing over 22 years of specialist expertise in cardiovascular
+medicine to his practice.
+
+Dr. Knapton holds an MBBS, MD, and is a Fellow of the Royal College of Physicians
+(FRCP). His clinical interests include the diagnosis and management of heart
+failure, coronary artery disease, and cardiac arrhythmias.
+
+A warm and dedicated physician, Dr. Knapton takes pride in ensuring every patient
+feels heard and fully informed during their consultation at Portmore Medical Center.
+```
+
+---
+
+### 48. AI Feedback Summary
+**Page:** `AdminView.aspx` — Generate Summary button in Feedback section.
+
+**Output (24 submissions, avg 4.3/5):**
+```
+Overall patient satisfaction remains strong at 4.3 / 5. The most consistently
+praised themes are clinical expertise and doctor communication, with multiple
+patients highlighting that staff explained procedures clearly. The primary area
+for improvement is waiting times, particularly for afternoon Cardiology slots.
+One submission was classified Distressed and has been flagged for follow-up.
+
+Recommended action: Review afternoon Cardiology scheduling buffers and consider
+a proactive update message for patients waiting beyond 20 minutes.
+```
+
+---
+
+### 49. Daily Health Tip
+**Page:** `HomePage.aspx` — generated once per day, cached for all visitors.
+
+**Output (example):**
+```
+💡 Today's Health Tip: Staying hydrated is one of the simplest things you can
+do for your health. Aim for 6–8 glasses of water per day — more if you are
+active or in warm weather. Proper hydration supports kidney function,
+concentration, and even mood. Keep a glass on your desk as a visual reminder.
+```
+
+---
+
+### 50. Pre-Appointment Questionnaire Analyser
+**Page:** `Questionnaire.aspx` — summary passed through to `AppointmentForm.aspx`.
+
+**Input:**
+```
+Main symptom : Chest tightness and breathlessness on exertion
+Duration     : 3 weeks | Severity: 7/10
+Prior episodes: Yes — twice in the last month
+Medications  : Aspirin, Atorvastatin
+```
+**Output (pre-screening summary, stored in session):**
+```
+Patient reports recurring chest tightness and exertional breathlessness (severity
+7/10) over 3 weeks, with two prior episodes in the last month. Current medications
+include Aspirin and Atorvastatin, suggesting existing cardiovascular risk
+management. Clinical assessment should prioritise ruling out acute coronary
+syndrome or heart failure. Early ECG and cardiac biomarkers recommended on arrival.
 ```
 
 ---
